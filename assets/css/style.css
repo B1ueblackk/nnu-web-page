@@ -89,13 +89,7 @@ body{
     font-weight: 600;
     text-decoration: none;
 }
-/*.nav a {*/
-/*    white-space: normal;       !* ✅ 允许换行 *!*/
-/*    text-align: center;        !* ✅ 居中换行内容 *!*/
-/*    width: 120px;              !* ✅ 设置固定宽度 *!*/
-/*    line-height: 1.4;          !* 行高适中 *!*/
-/*    */
-/*}*/
+
 .nav a:hover{color:var(--accent);}
 
 /* 移动端导航菜单按钮 */
