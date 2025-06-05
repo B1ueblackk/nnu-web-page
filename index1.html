@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>会议标题 | IWSA 2024</title>
+
+    <!-- ===== 内联 CSS ===== -->
+    <style>
+        /* —— reset & 基础 —— */
+        *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,blinkmacsystemfont,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;}
+        body{background:#f4f4f4;}
+
+        /* —— 顶栏 —— */
+        .header{background:#0ea4e9;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 3%;}
+        .header .logo{width:120px;height:auto;}
+        .header h1{font-size:2rem;font-weight:700;text-align:center;flex:1;}
+
+        /* —— 导航 —— */
+        .nav{background:#be0022;color:#fff;display:flex;flex-wrap:wrap;justify-content:center;}
+        .nav a{color:#fff;text-decoration:none;padding:8px 16px;white-space:nowrap;}
+        .nav a:hover{background:rgba(255,255,255,.2);}
+
+        /* —— 主体布局：左侧窄栏 + 右侧内容栅格 —— */
+        .wrapper{max-width:1300px;margin:24px auto;border:1px solid #ccc;background:#fff;display:grid;grid-template-columns:220px 1fr;}
+        @media(max-width:768px){.wrapper{grid-template-columns:1fr;}.sidebar{order:2}}
+
+        /* —— 侧栏 —— */
+        .sidebar{display:flex;flex-direction:column;gap:20px;padding:20px;background:#e9f5ff;}
+        .block{border:1px solid #999;padding:12px;text-align:center;}
+        .block h2{font-size:1.25rem;margin-bottom:4px;}
+        .block .timer{font-size:1.5rem;font-weight:700;color:#be0022;}
+
+        /* —— 滚动名单 —— */
+        .credits{height:200px;overflow:hidden;position:relative;}
+        .credits ul{list-style:none;margin:0;padding:0;position:absolute;width:100%;animation:credits-scroll 20s linear infinite;}
+        @keyframes credits-scroll{0%{top:100%;}100%{top:-100%;}}
+
+        /* —— 主内容部分 —— */
+        .main{padding:20px;display:flex;flex-direction:column;gap:20px;}
+        .section{border:1px solid #999;padding:24px;text-align:center;}
+        .section h2{font-size:1.5rem;margin-bottom:8px;font-weight:700;}
+
+        /* —— 轮播展示区 —— */
+        .carousel{position:relative;height:300px;overflow:hidden;}
+        .carousel .slide{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;transition:opacity .6s ease;}
+        .carousel .slide.active{opacity:1;z-index:1;}
+        .carousel img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;transition:opacity .6s ease;}
+        .slide .caption{position:absolute;left:0;bottom:0;width:100%;background:rgba(0,0,0,.6);color:#fff;font-size:1.25rem;padding:8px 12px;text-align:left;}
+        .carousel-nav{position:absolute;right:10px;bottom:10px;display:flex;gap:4px;z-index:2;}
+        .carousel-nav button{width:32px;height:32px;line-height:32px;border:1px solid #888;background:rgba(255,255,255,.25);color:#fff;font-weight:600;cursor:pointer;}
+        .carousel-nav button.active{background:#be0022;border-color:#be0022;}
+
+        /* —— 联系方式 —— */
+        .section.contact{background:#0ea4e9;color:#fff;}
+    </style>
+</head>
+
+<body>
+<!-- 顶栏 -->
+<header class="header">
+    <img src="assets/img/logo.png" alt="左 Logo" class="logo">
+    <h1>会议标题</h1>
+    <img src="assets/img/logo.png" alt="右 Logo" class="logo">
+</header>
+
+<!-- 导航 -->
+<nav class="nav">
+    <a href="#">网站首页</a><a href="#">组织机构</a><a href="#">注册须知</a>
+    <a href="#">投稿安排</a><a href="#">日程安排</a>
+    <a href="#">MSSCAI/CRITIC</a><a href="#">IWSA/MSET/ICT</a><a href="#">English</a>
+    <a href="index.html">查看另一版本</a>
+</nav>
+
+<!-- 主体 -->
+<div class="wrapper">
+    <!-- 侧栏 -->
+    <aside class="sidebar">
+        <div class="block" id="countdown">
+            <h2>倒计时</h2>
+            <div class="timer" id="time-left">-- 天 --:--:--</div>
+        </div>
+
+        <div class="block">
+            <h2>会议组织机构及成员</h2>
+            <div class="credits">
+                <ul>
+                    <li>主办单位 A</li><li>协办单位 B</li><li>学术委员会 C</li>
+                    <li>组织委员会 D</li><li>顾问委员会 E</li>
+                    <!-- 更多成员... -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="block">
+            <h2>学校 LOGO</h2>
+            <img src="assets/img/universities/NNU.jpg" alt="School Logo" style="width:80%;height:auto;">
+            <img src="assets/img/universities/NNU.jpg" alt="School Logo" style="width:80%;height:auto;">
+            <img src="assets/img/universities/NNU.jpg" alt="School Logo" style="width:80%;height:auto;"><img src="assets/img/universities/NNU.jpg" alt="School Logo" style="width:80%;height:auto;">
+            <img src="assets/img/universities/NNU.jpg" alt="School Logo" style="width:80%;height:auto;">
+
+        </div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="main">
+        <section class="section intro"><h2>会议简介</h2><p>在此放置会议背景、目标与特色简介……</p></section>
+
+        <!-- 图片轮播 -->
+        <section class="section carousel" id="carousel">
+            <div class="slide active">
+                <img src="assets/img/pics/slide1.jpg" alt="展览1"><span class="caption">2025 xxxx 标题 1</span>
+            </div>
+            <div class="slide">
+                <img src="assets/img/pics/slide2.jpg" alt="展览2"><span class="caption">2025 xxxx 标题 2</span>
+            </div>
+            <div class="slide">
+                <img src="assets/img/pics/slide1.jpg" alt="展览3"><span class="caption">2025 xxxx 标题 3</span>
+            </div>
+            <div class="slide">
+                <img src="assets/img/pics/slide2.jpg" alt="展览4"><span class="caption">2025 xxxx 标题 4</span>
+            </div>
+            <div class="carousel-nav">
+                <button data-index="0" class="active">1</button><button data-index="1">2</button>
+                <button data-index="2">3</button><button data-index="3">4</button>
+            </div>
+        </section>
+
+        <section class="section news"><h2>新闻动态</h2>
+            <ul style="text-align:left">
+                <li>📌 2025‑06‑01 会议系统开放注册</li>
+                <li>📌 2025‑05‑20 Keynote 嘉宾公布</li>
+                <li>📌 2025‑05‑15 论文投稿通道上线</li>
+            </ul>
+        </section>
+
+        <section class="section dates" style="background:#d5edcf;">
+            <h2>重要日期</h2>
+            <ul style="text-align:left">
+                <li>摘要提交截止：2025‑07‑10</li>
+                <li>全文提交截止：2025‑08‑01</li>
+                <li>早鸟注册截止：2025‑08‑15</li>
+                <li>会议日期：2025‑09‑10 – 09‑12</li>
+            </ul>
+        </section>
+
+        <section class="section contact"><h2>联系方式</h2>
+            <p>Email：conf@apmtt.org | 地址：某市某路 123 号 | 联系人：张老师 (+86 123‑4567‑8901)</p>
+        </section>
+    </main>
+</div>
+
+<!-- ===== 内联 JS ===== -->
+<script>
+    // === 倒计时 ===
+    (function(){
+        const target = new Date('2025-09-10T09:00:00');
+        function render(){
+            const el = document.getElementById('time-left');
+            if(!el) return;
+            const diff = target - new Date();
+            if(diff <= 0){ el.textContent='开幕啦！'; return;}
+            const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24,
+                m=Math.floor(diff/6e4)%60, s=Math.floor(diff/1e3)%60;
+            el.textContent=`${d} 天 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        render(); setInterval(render,1000);
+    })();
+
+    // === 轮播 ===
+    (function(){
+        const slides=[...document.querySelectorAll('#carousel .slide')],
+            btns=[...document.querySelectorAll('.carousel-nav button')];
+        let idx=0; function show(i){
+            slides[idx].classList.remove('active'); btns[idx].classList.remove('active');
+            idx=i; slides[idx].classList.add('active'); btns[idx].classList.add('active');
+        }
+        btns.forEach((b,i)=>b.addEventListener('click',()=>show(i)));
+        setInterval(()=>show((idx+1)%slides.length),4000);
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,638 @@
+/* —— reset & 基础 —— */
+html, body{
+    max-width:100%;
+    overflow-x:hidden;   /* 屏蔽任何水平溢出 */
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+    background:#fafafa;
+    font-family:"Times New Roman", Times, serif;
+    color:#222;
+    line-height:1.6;
+
+}
+/* 原来大约是 padding:32px; */
+.main{
+    padding:24px;          /* 侧栏也是 24px */
+    display:flex;
+    flex-direction:column;
+    gap:28px;              /* 保持块之间间距 */
+}
+
+/* 主题色：深靛蓝 + 金色点缀 */
+:root{
+    --primary:#102a54;
+    --accent:#c39528;
+}
+
+/* 顶栏 */
+.header{
+    background:var(--primary);
+    color:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 4%;
+}
+.header .logo{
+    height:40px;
+    width:auto;
+}
+.header h1{
+    font-size:2rem;
+    font-weight:700;
+    letter-spacing:.02rem;
+    flex:1;
+    text-align:center;
+    text-transform: uppercase;
+    font-family:"Times New Roman", Times, serif;
+    padding:0 10px;
+}
+
+/* 导航 */
+.nav{
+    background:#fff;
+    border-top:3px solid var(--accent);
+    display:flex;flex-wrap:wrap;justify-content:center;
+    position:relative;
+    transition: transform 0.3s ease;
+}
+.nav a{
+    color:var(--primary);
+    padding:10px 18px;
+    text-decoration:none;
+    font-weight:600;
+    white-space:nowrap;
+}
+.nav a:hover{color:var(--accent);}
+
+/* 移动端导航菜单按钮 */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 10px;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 遮罩层 */
+.nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-overlay.active {
+    opacity: 1;
+}
+
+/* 卡片式侧栏 */
+.sidebar{background:#f0f4fa;padding:24px;display:flex;flex-direction:column;gap:28px;}
+.block{background:#fff;border:1px solid #d0d8e6;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+.block h2{color:var(--primary);margin-bottom:8px;font-size:1.35rem;}
+
+/* 倒计时数字 */
+.block .timer{
+    font-size:1.5rem;
+    font-weight:700;
+    color:var(--accent);
+}
+.timer{
+    white-space: nowrap;           /* 不自动换行 */
+    font-variant-numeric: tabular-nums;  /* 等宽数字，避免 1 和 8 宽度差太大 */
+}
+/* —— 滚动名单 —— */
+.credits{
+    height:200px;
+    overflow:hidden;
+    position:relative;
+}
+.credits ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    position:absolute;
+    width:100%;
+    animation:credits-scroll 15s linear infinite;
+}
+@keyframes credits-scroll{
+    0%{top:100%;}
+    100%{top:-100%;}
+}
+
+/* 组织机构分组标题样式 */
+.credits .group-title {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1.1em;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--accent);
+    margin-bottom: 4px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.credits ul li:not(.group-title) {
+    padding: 4px 0;
+    color: #333;
+}
+
+/* 确保滚动动画平滑 */
+@keyframes credits-scroll {
+    0% {
+        top: 100%;
+    }
+    100% {
+        top: -100%;
+    }
+}
+
+.credits ul {
+    animation: credits-scroll 15s linear infinite;
+}
+
+.credits:hover ul {
+    animation-play-state: paused;
+}
+
+/* 主体区域 */
+.wrapper{
+    max-width:1360px;
+    margin:32px auto;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:24px;
+    padding:0 16px;
+}
+@media(max-width:840px){.wrapper{grid-template-columns:1fr;}.sidebar{order:2}}
+
+/* 章节卡片 */
+.section{
+    background:#fff;
+    border:1px solid #d0d8e6;
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
+    padding:32px;
+    margin-bottom:24px;
+}
+.section h2{
+    color:var(--primary);
+    font-size:1.65rem;
+    margin-bottom:14px;
+    border-left:4px solid var(--accent);
+    padding-left:12px;
+}
+
+/* 会议简介样式 */
+.intro p {
+    text-align: justify;
+    margin-bottom: 1.2em;
+    line-height: 1.8;
+    color: #333;
+}
+
+.intro .highlight {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.intro .subtitle {
+    font-size: 1.2em;
+    color: var(--primary);
+    margin: 1.5em 0 0.8em;
+    font-weight: 600;
+}
+
+.intro ul {
+    list-style-type: none;
+    padding-left: 1.2em;
+    margin: 1em 0;
+}
+
+.intro ul li {
+    position: relative;
+    padding-left: 1.5em;
+    margin-bottom: 0.8em;
+    line-height: 1.6;
+}
+
+.intro ul li:before {
+    content: "•";
+    color: var(--accent);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* —— 轮播展示区 —— */
+.carousel{position:relative;height:300px;overflow:hidden;}
+.carousel .slide{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;transition:opacity .6s ease;}
+.carousel .slide.active{opacity:1;z-index:1;}
+.carousel img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;transition:opacity .6s ease;}
+.slide .caption{position:absolute;left:0;bottom:0;width:100%;background:rgba(0,0,0,.6);color:#fff;font-size:1.25rem;padding:8px 12px;text-align:left;}
+.carousel-nav{position:absolute;right:10px;bottom:10px;display:flex;gap:4px;z-index:2;}
+.carousel-nav button{width:32px;height:32px;line-height:32px;border:1px solid #888;background:rgba(255,255,255,.25);color:#fff;font-weight:600;cursor:pointer;}
+.carousel-nav button.active{background:#be0022;border-color:#be0022;}
+
+/* 移动端适配 */
+@media (max-width: 1024px) {
+    .wrapper {
+        grid-template-columns: 220px 1fr;
+        gap: 16px;
+    }
+    
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .section {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        order: 2;
+    }
+    
+    .header {
+        padding: 10px 16px;
+    }
+    
+    .header .logo {
+        height: 32px;
+    }
+    
+    .header h1 {
+        font-size: 1.3rem;
+        padding: 0 8px;
+    }
+    
+    /* 移动端导航菜单 */
+    .menu-toggle {
+        display: block;
+    }
+    
+    .nav {
+        position: fixed;
+        top: 0;
+        right: -280px;
+        width: 280px;
+        height: 100vh;
+        flex-direction: column;
+        background: #fff;
+        box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+        z-index: 1000;
+        padding: 60px 0 20px;
+        border-top: none;
+        border-left: 3px solid var(--accent);
+        transform: translateX(0);
+    }
+    
+    .nav.active {
+        transform: translateX(-280px);
+    }
+    
+    .nav a {
+        padding: 15px 25px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+        font-size: 1.1rem;
+    }
+    
+    .nav a:first-child {
+        border-top: 1px solid #eee;
+    }
+    
+    .nav-overlay {
+        display: block;
+    }
+    
+    .nav-overlay.active {
+        display: block;
+    }
+    
+    /* 防止body滚动 */
+    body.nav-open {
+        overflow: hidden;
+    }
+    
+    .section {
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+    
+    .section h2 {
+        font-size: 1.4rem;
+    }
+    
+    .intro .subtitle {
+        font-size: 1.1em;
+    }
+    
+    .carousel {
+        height: 200px;
+    }
+    
+    .slide .caption {
+        font-size: 1rem;
+        padding: 6px 10px;
+    }
+    
+    .carousel-nav button {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .section {
+        padding: 16px;
+    }
+    
+    .section h2 {
+        font-size: 1.2rem;
+    }
+    
+    .intro p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .carousel {
+        height: 160px;
+    }
+    
+    .block {
+        padding: 12px;
+    }
+    
+    .block h2 {
+        font-size: 1.1rem;
+    }
+    
+    .timer {
+        font-size: 1.2rem;
+    }
+}
+
+/* 确保图片响应式 */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 优化表格在移动端的显示 */
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* 优化列表在移动端的显示 */
+@media (max-width: 768px) {
+    .credits {
+        height: 150px;
+    }
+    
+    .credits ul li {
+        font-size: 0.9rem;
+    }
+}
+
+/* 学校与组织部分样式 */
+.organizations {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.org-section {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.org-section h3 {
+    color: var(--primary);
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent);
+}
+
+.logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    align-items: center;
+    justify-items: center;
+}
+
+.logo-item {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 6px;
+    transition: transform 0.3s ease;
+}
+
+.logo-item:hover {
+    transform: translateY(-5px);
+}
+
+.logo-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* 针对不同部分的特殊样式 */
+.schools .logo-item {
+    height: 140px; /* 学校logo通常较大 */
+}
+
+.organizers .logo-item {
+    height: 130px; /* 主办单位logo稍大 */
+}
+
+.co-organizers .logo-item {
+    height: 110px; /* 协办单位logo稍小 */
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .logo-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+
+    .logo-item {
+        height: 100px;
+        padding: 0.8rem;
+    }
+
+    .schools .logo-item {
+        height: 120px;
+    }
+
+    .organizers .logo-item {
+        height: 110px;
+    }
+
+    .co-organizers .logo-item {
+        height: 90px;
+    }
+
+    .org-section {
+        padding: 1rem;
+    }
+
+    .org-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .logo-item {
+        height: 90px;
+        padding: 0.6rem;
+    }
+
+    .schools .logo-item {
+        height: 100px;
+    }
+
+    .organizers .logo-item {
+        height: 90px;
+    }
+
+    .co-organizers .logo-item {
+        height: 80px;
+    }
+}
+
+/* 学校部分样式 */
+.schools-section {
+    background: #f8f9fa;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-top: 3px solid var(--accent);
+}
+
+.schools-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--primary);
+    font-size: 1.8rem;
+}
+
+.schools-section .logo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);  /* 改为5列 */
+    gap: 1.5rem;  /* 减小间距 */
+    padding: 1rem;
+}
+
+.schools-section .logo-item {
+    height: 140px;  /* 减小高度 */
+    background: #fff;
+    padding: 1.2rem;  /* 减小内边距 */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.schools-section .logo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.schools-section .logo-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* 移动端适配 */
+@media (max-width: 1024px) {
+    .schools-section .logo-grid {
+        grid-template-columns: repeat(4, 1fr);  /* 平板端4列 */
+    }
+}
+
+@media (max-width: 768px) {
+    .schools-section {
+        padding: 1.5rem;
+    }
+
+    .schools-section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .schools-section .logo-grid {
+        grid-template-columns: repeat(3, 1fr);  /* 小平板3列 */
+        gap: 1rem;
+    }
+
+    .schools-section .logo-item {
+        height: 120px;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .schools-section {
+        padding: 1rem;
+    }
+
+    .schools-section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+
+    .schools-section .logo-grid {
+        grid-template-columns: repeat(2, 1fr);  /* 手机端2列 */
+        gap: 0.8rem;
+    }
+
+    .schools-section .logo-item {
+        height: 100px;
+        padding: 0.8rem;
+    }
+}
