@@ -9,7 +9,7 @@ function updateClock () {
 
     // 已到目标时间
     if (diff <= 0) {
-        timerEl.textContent = '开幕啦！';
+        timerEl.textContent = '会议已开始';
         return;
     }
 
@@ -167,6 +167,23 @@ function updateCountdown() {
     document.getElementById('time-left').textContent = 
         `${days} 天 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
+
+// 滚动
+window.addEventListener('DOMContentLoaded', () => {
+    const ul = document.querySelector('.credits ul');
+    const container = document.querySelector('.credits');
+
+    if (ul && container) {
+        const listHeight = ul.scrollHeight;
+        const containerHeight = container.clientHeight;
+        const distance = listHeight + containerHeight;
+        const speed = 40; // px/sec
+        const duration = distance / speed;
+
+        ul.style.animationDuration = `${duration}s`;
+        ul.style.setProperty('--scroll-distance', `${listHeight}px`);
+    }
+});
 
 // 初始化倒计时并每秒更新
 updateCountdown();

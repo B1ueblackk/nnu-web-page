@@ -8,25 +8,29 @@
 </head>
 <body>
 
-<!-- 顶栏：左右 logo + 标题 -->
-<header class="header">
-    <img src="assets/img/logo.png" alt="左 Logo" class="logo">
-    <h1>2025年无线通信与射频感知联合峰会</h1>
-    <img src="assets/img/logo.png" alt="右 Logo" class="logo">
-</header>
+<div class="container">
+    <!-- 顶栏：左右 logo + 标题 -->
+    <header class="header">
+        <h1>2025年无线通信与射频感知联合峰会</h1>
+    </header>
 
-<!-- 导航条 -->
-<nav class="nav">
-    <a href="index.html">网站首页</a>
-    <a href="organization.html">组织机构</a>
-    <a href="registration.html">注册须知</a>
-    <a href="submission.html">投稿安排</a>
-    <a href="schedule.html">日程安排</a>
-    <a href="msscai.html">MSSCAI/CRITIC</a>
-    <a href="iwsa.html">IWSA/MSET/ICT</a>
-    <a href="english.html">English</a>
-</nav>
+    <!-- 导航条 -->
+    <nav class="nav">
+        <a href="index.html">网站首页</a>
+        <a href="subpages/organization.html">组织机构</a>
+        <a href="subpages/registration.html">注册登记</a>
+        <a href="subpages/arrangement.html">场地安排</a>
+        <a href="subpages/schedule.html">日程安排</a>
+        <a href="subpages/call-for-paper/submission.htmlsubmission.html">投稿网址</a>
+        <a href="http://apmtt.org/iwsa2025">IWSA2025</a>
+        <a href="subpages/dccydljcjsyth.html">电磁场与电路集成技术研讨会</a>
+        <a href="subpages/hmyhm.html">全国毫米波、亚毫米波学术会议</a>
+        <a href="subpages/mnjc.html">模拟集成电路研产贯通交流会</a>
+        <a href="subpages/english.html">English</a>
+    </nav>
+</div>
 
+<div class="container">
 <!-- 主体 -->
 <div class="wrapper">
     <!-- 侧栏 -->
@@ -116,6 +120,25 @@
 
     <!-- 主内容区 -->
     <main class="main">
+        <!-- 图片轮播 -->
+        <section class="section carousel" id="carousel">
+            <div class="slide active">
+                <img src="assets/img/pics/slide1.jpg" alt="展览1"><span class="caption">2025 xxxx 标题 1</span>
+            </div>
+            <div class="slide">
+                <img src="assets/img/pics/slide2.jpg" alt="展览2"><span class="caption">2025 xxxx 标题 2</span>
+            </div>
+            <div class="slide">
+                <img src="assets/img/pics/slide1.jpg" alt="展览3"><span class="caption">2025 xxxx 标题 3</span>
+            </div>
+            <div class="slide">
+                <img src="assets/img/pics/slide2.jpg" alt="展览4"><span class="caption">2025 xxxx 标题 4</span>
+            </div>
+            <div class="carousel-nav">
+                <button data-index="0" class="active">1</button><button data-index="1">2</button>
+                <button data-index="2">3</button><button data-index="3">4</button>
+            </div>
+        </section>
         <!-- 会议简介 -->
         <section class="section intro">
             <h2>会议简介</h2>
@@ -136,24 +159,15 @@
             <p>由江苏省集成电路学会模拟集成电路专委会主办，会议聚焦"技术攻关·生态共建·人才共育"，集结学术界、企业与政府代表，探讨模拟集成电路的研发瓶颈与产业化路径。通过深化"研-产-用"协同，助力国产芯片自主创新，构建开放共赢的产业生态。</p>
         </section>
 
-        <!-- 图片轮播 -->
-        <section class="section carousel" id="carousel">
-            <div class="slide active">
-                <img src="assets/img/pics/slide1.jpg" alt="展览1"><span class="caption">2025 xxxx 标题 1</span>
-            </div>
-            <div class="slide">
-                <img src="assets/img/pics/slide2.jpg" alt="展览2"><span class="caption">2025 xxxx 标题 2</span>
-            </div>
-            <div class="slide">
-                <img src="assets/img/pics/slide1.jpg" alt="展览3"><span class="caption">2025 xxxx 标题 3</span>
-            </div>
-            <div class="slide">
-                <img src="assets/img/pics/slide2.jpg" alt="展览4"><span class="caption">2025 xxxx 标题 4</span>
-            </div>
-            <div class="carousel-nav">
-                <button data-index="0" class="active">1</button><button data-index="1">2</button>
-                <button data-index="2">3</button><button data-index="3">4</button>
-            </div>
+        <!-- 重要日期 -->
+        <section class="section dates" style="background:#d5edcf;">
+            <h2>重要日期</h2>
+            <ul style="text-align:left">
+                <li>摘要提交截止：2025-07-10</li>
+                <li>全文提交截止：2025-08-01</li>
+                <li>早鸟注册截止：2025-08-15</li>
+                <li>会议日期：2025-09-10 – 09‑12</li>
+            </ul>
         </section>
 
         <!-- 新闻动态 -->
@@ -166,16 +180,6 @@
             </ul>
         </section>
 
-        <!-- 重要日期 -->
-        <section class="section dates" style="background:#d5edcf;">
-            <h2>重要日期</h2>
-            <ul style="text-align:left">
-                <li>摘要提交截止：2025-07-10</li>
-                <li>全文提交截止：2025-08-01</li>
-                <li>早鸟注册截止：2025-08-15</li>
-                <li>会议日期：2025-09-10 – 09‑12</li>
-            </ul>
-        </section>
 
         <!-- 联系方式 -->
         <section class="section contact">
@@ -187,15 +191,6 @@
         <section class="section schools-section">
             <h2>合作院校与组织</h2>
             <div class="logo-grid schools">
-                <!--                <div class="logo-item">-->
-                <!--                    <img src="assets/img/left_logo/1.%20IEEE%20Macau%20APMTT%20Joint%20Chapter.png" alt="IEEE Macau APMTT Joint Chapter">-->
-                <!--                </div>-->
-                <!--                <div class="logo-item">-->
-                <!--                    <img src="assets/img/left_logo/2macau.png" alt="澳门大学">-->
-                <!--                </div>-->
-                <!--                <div class="logo-item">-->
-                <!--                    <img src="assets/img/left_logo/3.Nanjing Normal University.png" alt="南京师范大学">-->
-                <!--                </div>-->
                 <div class="logo-item">
                     <img src="assets/img/left_logo/4.jpg" alt="南京邮电大学">
                 </div>
@@ -220,6 +215,7 @@
             </div>
         </section>
     </main>
+</div>
 </div>
 
 <script src="js/main.js"></script>
