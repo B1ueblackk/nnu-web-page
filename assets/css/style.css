@@ -333,24 +333,32 @@ body{
     .nav {
         position: fixed;
         top: 0;
-        right: -280px;
-        width: 280px;
+        right: -100%;
+        width: 80%;
+        max-width: 300px;
         height: 100vh;
-        display: block; /* 替换 flex-direction 以避免两列换行 */
         background: #fff;
-        box-shadow: -2px 0 8px rgba(0,0,0,0.1);
         z-index: 1000;
-        padding: 60px 0 20px;
-        border-top: none;
-        border-left: 3px solid var(--accent);
-        transform: translateX(0);
-        overflow-y: auto; /* ✅ 新增：启用垂直滚动 */
-        overscroll-behavior: contain; /* 防止滚动穿透 */
-        scroll-behavior: smooth;
+        flex-direction: column;
+        padding: 60px 20px 20px;
+        transition: right 0.3s ease;
+        overflow-y: auto;
     }
 
     .nav.active {
-        transform: translateX(-280px);
+        right: 0;
+    }
+
+    .nav-overlay {
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .nav-overlay.active {
+        opacity: 1;
+        visibility: visible;
     }
 
     .nav a {
@@ -365,19 +373,11 @@ body{
         text-align: left;
         font-size: 1.1rem;
     }
-    
+
     .nav a:first-child {
         border-top: 1px solid #eee;
     }
-    
-    .nav-overlay {
-        display: block;
-    }
-    
-    .nav-overlay.active {
-        display: block;
-    }
-    
+
     /* 防止body滚动 */
     body.nav-open {
         overflow: hidden;

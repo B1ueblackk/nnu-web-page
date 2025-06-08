@@ -60,14 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
         body.classList.toggle('nav-open');
     }
 
-    // 点击菜单按钮
-    menuToggle.addEventListener('click', function(e) {
+    // 点击菜单按钮切换菜单
+    menuToggle.addEventListener('click', toggleMenu);
+
+    // 点击遮罩层关闭菜单
+    overlay.addEventListener('click', function(e) {
         e.stopPropagation();
         toggleMenu();
     });
-
-    // 点击遮罩层关闭菜单
-    overlay.addEventListener('click', toggleMenu);
 
     // 点击导航链接后关闭菜单
     document.querySelectorAll('.nav a').forEach(link => {
