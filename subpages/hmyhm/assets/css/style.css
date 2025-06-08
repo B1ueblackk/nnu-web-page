@@ -65,7 +65,7 @@ body{
 }
 /* 控制 header 和 nav 的宽度一致，并居中显示 */
 .header
-/*, .nav */
+    /*, .nav */
 {
     max-width: 1360px;   /* 跟 .wrapper 一致 */
     margin: 0 auto;
@@ -293,11 +293,11 @@ body{
         grid-template-columns: 220px 1fr;
         gap: 16px;
     }
-    
+
     .header h1 {
         font-size: 1.6rem;
     }
-    
+
     .section {
         padding: 24px;
     }
@@ -307,29 +307,29 @@ body{
     .wrapper {
         grid-template-columns: 1fr;
     }
-    
+
     .sidebar {
         order: 2;
     }
-    
+
     .header {
         padding: 10px 16px;
     }
-    
+
     .header .logo {
         height: 32px;
     }
-    
+
     .header h1 {
         font-size: 1.3rem;
         padding: 0 8px;
     }
-    
+
     /* 移动端导航菜单 */
     .menu-toggle {
         display: block;
     }
-    
+
     .nav {
         position: fixed;
         top: 0;
@@ -345,57 +345,57 @@ body{
         border-left: 3px solid var(--accent);
         transform: translateX(0);
     }
-    
+
     .nav.active {
         transform: translateX(-280px);
     }
-    
+
     .nav a {
         padding: 15px 25px;
         border-bottom: 1px solid #eee;
         text-align: left;
         font-size: 1.1rem;
     }
-    
+
     .nav a:first-child {
         border-top: 1px solid #eee;
     }
-    
+
     .nav-overlay {
         display: block;
     }
-    
+
     .nav-overlay.active {
         display: block;
     }
-    
+
     /* 防止body滚动 */
     body.nav-open {
         overflow: hidden;
     }
-    
+
     .section {
         padding: 20px;
         margin-bottom: 16px;
     }
-    
+
     .section h2 {
         font-size: 1.4rem;
     }
-    
+
     .intro .subtitle {
         font-size: 1.1em;
     }
-    
+
     .carousel {
         height: 200px;
     }
-    
+
     .slide .caption {
         font-size: 1rem;
         padding: 6px 10px;
     }
-    
+
     .carousel-nav button {
         width: 28px;
         height: 28px;
@@ -407,32 +407,32 @@ body{
     .header h1 {
         font-size: 1.1rem;
     }
-    
+
     .section {
         padding: 16px;
     }
-    
+
     .section h2 {
         font-size: 1.2rem;
     }
-    
+
     .intro p {
         font-size: 0.95rem;
         line-height: 1.6;
     }
-    
+
     .carousel {
         height: 160px;
     }
-    
+
     .block {
         padding: 12px;
     }
-    
+
     .block h2 {
         font-size: 1.1rem;
     }
-    
+
     .timer {
         font-size: 1.2rem;
     }
@@ -458,7 +458,7 @@ img {
     .credits {
         height: 150px;
     }
-    
+
     .credits ul li {
         font-size: 0.9rem;
     }
