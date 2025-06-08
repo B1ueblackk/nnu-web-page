@@ -82,8 +82,8 @@ body{
     height: 60px;               /* 统一高度，避免跳动 */
     padding: 6px;
     font-size: 14px;
-    white-space: normal;
-    word-break: break-word;
+    /* white-space: normal; */
+    /* word-break: break-word; */
     text-align: center;
     color: var(--primary);
     font-weight: 600;
@@ -336,7 +336,7 @@ body{
         right: -280px;
         width: 280px;
         height: 100vh;
-        flex-direction: column;
+        display: block; /* 替换 flex-direction 以避免两列换行 */
         background: #fff;
         box-shadow: -2px 0 8px rgba(0,0,0,0.1);
         z-index: 1000;
@@ -344,6 +344,9 @@ body{
         border-top: none;
         border-left: 3px solid var(--accent);
         transform: translateX(0);
+        overflow-y: auto; /* ✅ 新增：启用垂直滚动 */
+        overscroll-behavior: contain; /* 防止滚动穿透 */
+        scroll-behavior: smooth;
     }
 
     .nav.active {
@@ -351,6 +354,12 @@ body{
     }
 
     .nav a {
+        display: block;
+        width: 100%;
+        height: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         padding: 15px 25px;
         border-bottom: 1px solid #eee;
         text-align: left;
