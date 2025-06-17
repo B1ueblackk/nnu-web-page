@@ -141,3 +141,8 @@ window.addEventListener('DOMContentLoaded', () => {
 // 初始化倒计时并每秒更新
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
+// 登录功能
+function login() {
+    window.location.href = 'login/index.html';
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>登录 - 2025年无线通信与射频感知联合峰会</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        .login-button {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            background: linear-gradient(135deg, #357abd, #2a5f9e);
+            transform: translateY(-1px);
+        }
+
+        .login-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-links a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 顶栏：左右 logo + 标题 -->
+    <header class="header">
+        <h1>2025年无线通信与射频感知联合峰会</h1>
+    </header>
+
+    <!-- 导航条 -->
+    <nav class="nav">
+        <a href="https://jswcs2025.cn">网站首页</a>
+        <a href="https://jswcs2025.cn/organization/index.html">组织机构</a>
+        <a href="https://jswcs2025.cn/registration/index.html">注册登记</a>
+        <a href="https://jswcs2025.cn/arrangement/index.html">场地安排</a>
+        <a href="https://jswcs2025.cn/schedule/index.html">日程安排</a>
+        <a href="https://call-for-paper.jswcs2025.cn">投稿网址</a>
+        <a href="https://apmtt.org/iwsa2025">IWSA2025</a>
+        <a href="https://jswcs2025.cn/dccydljcjsyth/index.html">电磁场与电路集成技术研讨会</a>
+        <a href="https://jswcs2025.cn/hmyhm/index.html" target="_blank" rel="noopener noreferrer">全国毫米波、亚毫米波学术会议</a>
+        <a href="https://jswcs2025.cn/mnjc/index.html">模拟集成电路研产贯通交流会</a>
+        <a href="https://jswcs2025.cn/english/index.html">English</a>
+    </nav>
+</div>
+
+<div class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <h2>用户登录</h2>
+            <p>请登录以访问投稿系统</p>
+        </div>
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-button">登录</button>
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+        <div class="login-links">
+            <a href="register.html">注册新账号</a> |
+            <a href="forgot-password.html">忘记密码？</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('errorMessage');
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // 登录成功，重定向到个人中心
+                window.location.href = '../profile/index.html';
+            } else {
+                // 显示错误信息
+                errorMessage.textContent = data.message || '登录失败，请检查邮箱和密码';
+                errorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            errorMessage.textContent = '登录请求失败，请稍后重试';
+            errorMessage.style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>
