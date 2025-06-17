@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>个人中心 - 2025年无线通信与射频感知联合峰会</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .profile-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 15px;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #666;
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .profile-email {
+            color: #666;
+        }
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            padding: 6px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            background: #fff;
+            color: #666;
+        }
+        .btn i {
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+        .btn-logout {
+            color: #666;
+        }
+        .btn-logout:hover {
+            color: #333;
+        }
+        .profile-menu {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .profile-menu-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+        .profile-menu-item:hover {
+            background: #fafafa;
+            border-color: #ddd;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .profile-menu-item i {
+            font-size: 24px;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+        .profile-menu-item:hover i {
+            color: #333;
+        }
+        .profile-menu-item div {
+            font-size: 15px;
+            color: #555;
+            font-weight: 500;
+            position: relative;
+            padding-bottom: 8px;
+        }
+        .profile-menu-item div::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #d4af37;
+            transition: width 0.3s ease;
+        }
+        .profile-menu-item:hover div::after {
+            width: 100%;
+        }
+        .profile-menu-item:hover div {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 顶栏：左右 logo + 标题 -->
+    <header class="header">
+        <h1>2025年无线通信与射频感知联合峰会</h1>
+    </header>
+
+    <!-- 导航条 -->
+    <nav class="nav">
+        <a href="https://jswcs2025.cn">网站首页</a>
+        <a href="https://jswcs2025.cn/organization/index.html">组织机构</a>
+        <a href="https://jswcs2025.cn/registration/index.html">注册登记</a>
+        <a href="https://jswcs2025.cn/arrangement/index.html">场地安排</a>
+        <a href="https://jswcs2025.cn/schedule/index.html">日程安排</a>
+        <a href="http://call-for-paper.jswcs2025.cn">投稿网址</a>
+        <a href="http://apmtt.org/iwsa2025">IWSA2025</a>
+        <a href="https://jswcs2025.cn/dccydljcjsyth/index.html">电磁场与电路集成技术研讨会</a>
+        <a href="https://jswcs2025.cn/hmyhm/index.html" target="_blank" rel="noopener noreferrer">全国毫米波、亚毫米波学术会议</a>
+        <a href="https://jswcs2025.cn/mnjc/index.html">模拟集成电路研产贯通交流会</a>
+        <a href="https://jswcs2025.cn/english/index.html">English</a>
+    </nav>
+</div>
+
+<div class="container">
+    <!-- 主体 -->
+    <div class="wrapper">
+        <!-- 侧栏 -->
+        <aside class="sidebar">
+            <!-- 倒计时 -->
+            <div class="block" id="countdown">
+                <h2>倒计时</h2>
+                <div class="timer" id="time-left">-- 天 --:--:--</div>
+            </div>
+            <!-- 组织机构 -->
+            <div class="block">
+                <h2>会议组织机构及成员</h2>
+                <div class="credits">
+                    <ul>
+                        <li class="group-title">主办单位</li>
+                        <li>IEEE Macau AP/MTT Joint Chapter</li>
+                        <li>微波学报</li>
+                        <li>澳门大学</li>
+                        <li>南京师范大学</li>
+                        <li>南京理工大学</li>
+                        <li class="group-title">协办单位</li>
+                        <li>中国电子学会</li>
+                        <li>中国电子科技集团公司第十四研究所</li>
+                        <li>杭州电子科技大学绍兴集成电路研究院</li>
+                        <li>南京邮电大学</li>
+                        <li class="group-title">合作院校与组织</li>
+                        <li>江苏省集成电路学会</li>
+                        <li>深圳大学</li>
+                        <li>佛山大学</li>
+                        <li>苏州大学</li>
+                        <li>暨南大学</li>
+                        <li>IEEE</li>
+                        <li>IEEE IMS</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main">
+            <!-- 个人中心 -->
+            <section class="section profile-section">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <div class="profile-name">尊敬的张三先生/女士</div>
+                        <div class="profile-actions">
+                            <button class="btn" onclick="changePassword()">
+                                <i class="fas fa-key"></i> 更改密码
+                            </button>
+                            <button class="btn btn-logout" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> 退出
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="profile-menu-item" onclick="submitPaper()">
+                        <i class="fas fa-file-upload"></i>
+                        <div>投稿</div>
+                    </div>
+                    <div class="profile-menu-item" onclick="downloadPaper()">
+                        <i class="fas fa-download"></i>
+                        <div>下载</div>
+                    </div>
+                    <div class="profile-menu-item" onclick="editPaper()">
+                        <i class="fas fa-edit"></i>
+                        <div>修改</div>
+                    </div>
+                    <div class="profile-menu-item" onclick="deletePaper()">
+                        <i class="fas fa-trash-alt"></i>
+                        <div>删除</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 最近活动 -->
+            <section class="section profile-section">
+                <h2>最近活动</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-time">2024-03-20</div>
+                        <div class="activity-content">提交了新的论文投稿</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-time">2024-03-15</div>
+                        <div class="activity-content">更新了个人信息</div>
+                    </div>
+                </div>
+            </section>
+            <!-- 学校部分 -->
+            <section class="section schools-section">
+                <h2>合作院校与组织</h2>
+                <div class="logo-grid schools">
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/4.jpg" alt="南京邮电大学">
+                    </div>
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/5.Shenzhen University.png" alt="深圳大学">
+                    </div>
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/6.佛山大學 - 校徽（红色）.png" alt="佛山大学">
+                    </div>
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/7.Soochow University.png" alt="苏州大学">
+                    </div>
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/8.暨南大学logo.png" alt="暨南大学">
+                    </div>
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/IEEE.png" alt="IEEE">
+                    </div>
+                    <div class="logo-item">
+                        <img src="https://jswcs2025.cn/assets/img/left_logo/IEEE%20IMS%20Logo.png" alt="IEEE IMS">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
+<script src="../assets/main.js"></script>
+<script>
+function changePassword() {
+    // 更改密码功能待实现
+    alert('更改密码功能待实现');
+}
+
+function logout() {
+    // 退出功能待实现
+    alert('退出功能待实现');
+}
+
+function submitPaper() {
+    // 投稿功能待实现
+    alert('投稿功能待实现');
+}
+
+function downloadPaper() {
+    // 下载功能待实现
+    alert('下载功能待实现');
+}
+
+function editPaper() {
+    // 修改功能待实现
+    alert('修改功能待实现');
+}
+
+function deletePaper() {
+    // 删除功能待实现
+    alert('删除功能待实现');
+}
+</script>
+</body>
+</html>
