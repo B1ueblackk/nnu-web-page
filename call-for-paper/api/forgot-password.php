@@ -57,10 +57,7 @@ function loadEnv($path) {
             list($key, $value) = explode('=', $line, 2);
             $key = trim($key);
             $value = trim($value);
-
-            // 移除引号
             $value = trim($value, '"\'');
-
             putenv("$key=$value");
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
@@ -68,9 +65,9 @@ function loadEnv($path) {
     }
 }
 
-// 邮件发送函数
+// 邮件发送函数 - 使用163邮箱端口465
 function sendResetEmail($email, $resetUrl, $userName = '') {
-    writeLog('Starting email send process...');
+    writeLog('Starting email send process with 163 port 465...');
 
     // 检查是否有PHPMailer类
     if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
@@ -92,16 +89,16 @@ function sendResetEmail($email, $resetUrl, $userName = '') {
 
         $mail = new PHPMailer(true);
 
-        // 163邮箱SMTP配置
+        // 163邮箱SMTP配置 - 使用端口465和SSL加密
         $mail->isSMTP();
         $mail->Host = 'smtp.163.com';
         $mail->SMTPAuth = true;
         $mail->Username = $email163;
         $mail->Password = $password163;
-        $mail->SMTPSecure = false; // 不使用加密
-        $mail->Port = 465;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // 使用SSL加密
+        $mail->Port = 465; // 使用465端口
         $mail->CharSet = 'UTF-8';
-        $mail->Timeout = 20;
+        $mail->Timeout = 30;
 
         // 163邮箱特殊设置
         $mail->SMTPOptions = array(
@@ -111,6 +108,9 @@ function sendResetEmail($email, $resetUrl, $userName = '') {
                 'allow_self_signed' => true
             )
         );
+
+        // 启用调试（可选）
+        // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
 
         // 邮件设置
         $mail->setFrom($email163, '2025年无线通信与射频感知联合峰会');
@@ -122,65 +122,98 @@ function sendResetEmail($email, $resetUrl, $userName = '') {
 
         // 邮件内容
         $mail->Body = "
-        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
-            <div style='background: #4a90e2; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;'>
-                <h1>🔐 密码重置</h1>
-                <h2>2025年无线通信与射频感知联合峰会</h2>
+        <div style='font-family: Microsoft YaHei, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);'>
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center;'>
+                <h1 style='margin: 0 0 10px 0; font-size: 28px; font-weight: bold;'>🔐 密码重置</h1>
+                <h2 style='margin: 0; font-size: 16px; font-weight: normal; opacity: 0.9;'>2025年无线通信与射频感知联合峰会</h2>
             </div>
-            <div style='background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;'>
-                <p>亲爱的 <strong style='color: #4a90e2;'>{$userName}</strong>，</p>
-                <p>我们收到了您的密码重置请求。请点击下面的按钮重置您的密码：</p>
-                <div style='text-align: center; margin: 30px 0;'>
-                    <a href='{$resetUrl}' style='background: #4a90e2; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;'>🔑 立即重置密码</a>
+
+            <div style='padding: 40px 30px;'>
+                <div style='font-size: 18px; margin-bottom: 20px; color: #2c3e50;'>
+                    亲爱的 <strong style='color: #667eea;'>{$userName}</strong>，您好！
                 </div>
-                <p>如果按钮无法点击，请复制以下链接到浏览器地址栏：</p>
-                <div style='background: #f0f0f0; padding: 15px; border-radius: 4px; margin: 15px 0; border-left: 4px solid #4a90e2;'>
-                    <code style='word-break: break-all; font-size: 12px; color: #666;'>{$resetUrl}</code>
+
+                <p style='line-height: 1.6; color: #555;'>我们收到了您的密码重置请求。为了确保您的账户安全，请点击下面的按钮来重置您的密码：</p>
+
+                <div style='text-align: center; margin: 35px 0;'>
+                    <a href='{$resetUrl}' style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px; transition: transform 0.2s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);'>
+                        🔑 立即重置密码
+                    </a>
                 </div>
-                <div style='background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 4px; margin: 20px 0;'>
-                    <p style='margin: 0; color: #856404;'><strong>⚠️ 重要提示：</strong></p>
-                    <ul style='margin: 10px 0 0 0; color: #856404;'>
-                        <li>此链接在 <strong>30分钟</strong> 内有效</li>
-                        <li>链接只能使用 <strong>一次</strong></li>
-                        <li>如非本人操作，请忽略此邮件</li>
-                        <li>请勿将此链接分享给他人</li>
+
+                <p style='color: #666; line-height: 1.6;'>如果按钮无法正常使用，请复制以下链接到浏览器地址栏中访问：</p>
+
+                <div style='background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #667eea;'>
+                    <p style='margin: 0; word-break: break-all; font-family: Consolas, Monaco, monospace; font-size: 13px; color: #555; line-height: 1.4;'>{$resetUrl}</p>
+                </div>
+
+                <div style='background: #fff3cd; border: 1px solid #ffeaa7; border-left: 4px solid #f39c12; padding: 25px; border-radius: 8px; margin: 30px 0;'>
+                    <div style='color: #856404; font-weight: bold; margin-bottom: 15px; font-size: 16px;'>
+                        ⚠️ 重要安全提示
+                    </div>
+                    <ul style='margin: 0; padding-left: 20px; color: #856404; line-height: 1.6;'>
+                        <li style='margin-bottom: 8px;'>此重置链接在 <strong>30分钟</strong> 内有效，过期后需重新申请</li>
+                        <li style='margin-bottom: 8px;'>此链接只能使用 <strong>一次</strong>，使用后将自动失效</li>
+                        <li style='margin-bottom: 8px;'>如果您没有申请重置密码，请 <strong>立即忽略</strong> 此邮件</li>
+                        <li style='margin-bottom: 8px;'>为保护您的账户安全，请 <strong>不要</strong> 将此链接分享给任何人</li>
+                        <li>建议您重置后设置一个 <strong>强密码</strong>（至少6位，包含字母和数字）</li>
                     </ul>
                 </div>
-                <p style='margin-top: 30px;'>如有疑问，请联系技术支持。</p>
-                <p>此致敬礼！<br><strong>技术支持团队</strong></p>
+
+                <div style='background: #e3f2fd; padding: 20px; margin: 25px 0; border-radius: 8px; border-left: 4px solid #2196f3;'>
+                    <p style='margin: 0; color: #1976d2; font-weight: bold; margin-bottom: 10px;'>📞 需要技术支持？</p>
+                    <p style='margin: 0; color: #555; line-height: 1.6;'>如果您在重置密码过程中遇到任何问题，或者对我们的会议有其他疑问，请随时联系我们的技术支持团队。我们将竭诚为您服务！</p>
+                </div>
+
+                <div style='margin-top: 40px; color: #666; line-height: 1.6;'>
+                    <p>此致敬礼！</p>
+                    <p style='margin: 10px 0;'><strong style='color: #2c3e50;'>2025年无线通信与射频感知联合峰会</strong></p>
+                    <p style='margin: 0;'><em>技术支持团队</em></p>
+                </div>
             </div>
-            <div style='text-align: center; padding: 20px; color: #666; font-size: 12px; border-top: 1px solid #ddd;'>
-                <p>此邮件由系统自动发送，请勿直接回复</p>
-                <p>&copy; 2025 无线通信与射频感知联合峰会</p>
+
+            <div style='background: #f8f9fa; text-align: center; padding: 25px 20px; color: #666; font-size: 13px; border-top: 1px solid #e9ecef;'>
+                <p style='margin: 0 0 8px 0;'><strong>📧 此邮件由系统自动发送，请勿直接回复</strong></p>
+                <p style='margin: 0 0 8px 0;'>如需技术支持，请发送邮件至：<strong>{$email163}</strong></p>
+                <p style='margin: 0 0 15px 0;'>会议官网：<a href='https://jswcs2025.cn' style='color: #667eea; text-decoration: none;'>https://jswcs2025.cn</a></p>
+                <p style='margin: 0; padding-top: 15px; border-top: 1px solid #ddd;'>&copy; 2025 无线通信与射频感知联合峰会 版权所有</p>
             </div>
         </div>";
 
         $mail->AltBody = "
 密码重置 - 2025年无线通信与射频感知联合峰会
 
-亲爱的 {$userName}，
+亲爱的 {$userName}，您好！
 
 我们收到了您的密码重置请求。请访问以下链接重置您的密码：
 
 {$resetUrl}
 
-重要提示：
-- 此链接在30分钟内有效
-- 链接只能使用一次
-- 如非本人操作，请忽略此邮件
-- 请勿将此链接分享给他人
+重要安全提示：
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• 此重置链接在30分钟内有效，过期后需重新申请
+• 此链接只能使用一次，使用后将自动失效
+• 如果您没有申请重置密码，请立即忽略此邮件
+• 为保护您的账户安全，请不要将此链接分享给任何人
+• 建议您重置后设置一个强密码（至少6位，包含字母和数字）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-如有疑问，请联系技术支持。
+需要技术支持？
+如果您在重置密码过程中遇到任何问题，请联系我们：
+邮箱：{$email163}
+官网：https://jswcs2025.cn
 
 此致敬礼！
+2025年无线通信与射频感知联合峰会
 技术支持团队
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 此邮件由系统自动发送，请勿直接回复
-© 2025 无线通信与射频感知联合峰会
+© 2025 无线通信与射频感知联合峰会 版权所有
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ";
 
-        writeLog('Attempting to send email via 163...');
+        writeLog('Attempting to send email via 163 port 465...');
         $result = $mail->send();
         writeLog('Email send result: ' . ($result ? 'success' : 'failed'));
 
@@ -393,9 +426,9 @@ try {
         // 发送重置邮件
         $emailSent = sendResetEmail($email, $resetUrl, $userName);
 
-        // 返回响应（不管邮件是否成功发送）
+        // 返回响应
         if ($emailSent) {
-            writeLog('Reset email sent successfully via 163 to: ' . $email);
+            writeLog('Reset email sent successfully via 163 port 465 to: ' . $email);
             echo json_encode([
                 'success' => true,
                 'message' => '重置密码链接已发送到您的邮箱，请在30分钟内点击链接重置密码'
