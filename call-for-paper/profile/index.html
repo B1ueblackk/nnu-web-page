@@ -46,6 +46,7 @@
         }
         .profile-email {
             color: #666;
+            margin-top: 5px;
         }
         .profile-actions {
             display: flex;
@@ -135,6 +136,16 @@
         .profile-menu-item:hover div {
             color: #333;
         }
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -204,37 +215,8 @@
         <main class="main">
             <!-- 个人中心 -->
             <section class="section profile-section">
-                <div class="profile-header">
-                    <div class="profile-info">
-                        <div class="profile-name">尊敬的张三先生/女士</div>
-                        <div class="profile-actions">
-                            <button class="btn" onclick="changePassword()">
-                                <i class="fas fa-key"></i> 更改密码
-                            </button>
-                            <button class="btn btn-logout" onclick="logout()">
-                                <i class="fas fa-sign-out-alt"></i> 退出
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-menu">
-                    <div class="profile-menu-item" onclick="submitPaper()">
-                        <i class="fas fa-file-upload"></i>
-                        <div>投稿</div>
-                    </div>
-                    <div class="profile-menu-item" onclick="downloadPaper()">
-                        <i class="fas fa-download"></i>
-                        <div>下载</div>
-                    </div>
-                    <div class="profile-menu-item" onclick="editPaper()">
-                        <i class="fas fa-edit"></i>
-                        <div>修改</div>
-                    </div>
-                    <div class="profile-menu-item" onclick="deletePaper()">
-                        <i class="fas fa-trash-alt"></i>
-                        <div>删除</div>
-                    </div>
+                <div id="profileContent">
+                    <div class="loading">正在加载用户信息...</div>
                 </div>
             </section>
 
@@ -286,35 +268,130 @@
 <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
 <script src="../assets/main.js"></script>
 <script>
-function changePassword() {
-    // 更改密码功能待实现
-    alert('更改密码功能待实现');
-}
+    // 页面加载时获取用户信息
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUserInfo();
+    });
 
-function logout() {
-    // 退出功能待实现
-    alert('退出功能待实现');
-}
+    async function loadUserInfo() {
+        try {
+            const response = await fetch('../api/user-info.php', {
+                method: 'GET',
+                credentials: 'same-origin' // 包含会话cookie
+            });
 
-function submitPaper() {
-    // 投稿功能待实现
-    alert('投稿功能待实现');
-}
+            const data = await response.json();
 
-function downloadPaper() {
-    // 下载功能待实现
-    alert('下载功能待实现');
-}
+            if (data.success) {
+                displayUserInfo(data.user);
+            } else {
+                if (data.redirect) {
+                    // 如果需要重新登录，跳转到登录页
+                    window.location.href = data.redirect;
+                } else {
+                    displayError(data.message || '获取用户信息失败');
+                }
+            }
+        } catch (error) {
+            console.error('获取用户信息失败:', error);
+            displayError('无法连接到服务器，请稍后重试');
+        }
+    }
 
-function editPaper() {
-    // 修改功能待实现
-    alert('修改功能待实现');
-}
+    function displayUserInfo(user) {
+        const profileContent = document.getElementById('profileContent');
+        profileContent.innerHTML = `
+        <div class="profile-header">
+            <div class="profile-info">
+                <div>
+                    <div class="profile-name">尊敬的${user.name}${user.title || ''}</div>
+                    <div class="profile-email">${user.email}</div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn" onclick="changePassword()">
+                        <i class="fas fa-key"></i> 更改密码
+                    </button>
+                    <button class="btn btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> 退出
+                    </button>
+                </div>
+            </div>
+        </div>
 
-function deletePaper() {
-    // 删除功能待实现
-    alert('删除功能待实现');
-}
+        <div class="profile-menu">
+            <div class="profile-menu-item" onclick="submitPaper()">
+                <i class="fas fa-file-upload"></i>
+                <div>投稿</div>
+            </div>
+            <div class="profile-menu-item" onclick="downloadPaper()">
+                <i class="fas fa-download"></i>
+                <div>下载</div>
+            </div>
+            <div class="profile-menu-item" onclick="editPaper()">
+                <i class="fas fa-edit"></i>
+                <div>修改</div>
+            </div>
+            <div class="profile-menu-item" onclick="deletePaper()">
+                <i class="fas fa-trash-alt"></i>
+                <div>删除</div>
+            </div>
+        </div>
+    `;
+    }
+
+    function displayError(message) {
+        const profileContent = document.getElementById('profileContent');
+        profileContent.innerHTML = `
+        <div class="error-message">
+            ${message}
+            <br><br>
+            <button class="btn" onclick="window.location.href='../login/index.html'">
+                返回登录页
+            </button>
+        </div>
+    `;
+    }
+
+    function changePassword() {
+        // 更改密码功能待实现
+        alert('更改密码功能待实现');
+    }
+
+    async function logout() {
+        try {
+            // 可以添加一个logout API来清除服务器端会话
+            const response = await fetch('../api/logout.php', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+
+            // 无论服务器响应如何，都跳转到登录页
+            window.location.href = '../login/index.html';
+        } catch (error) {
+            // 即使出错也跳转到登录页
+            window.location.href = '../login/index.html';
+        }
+    }
+
+    function submitPaper() {
+        // 投稿功能待实现
+        alert('投稿功能待实现');
+    }
+
+    function downloadPaper() {
+        // 下载功能待实现
+        alert('下载功能待实现');
+    }
+
+    function editPaper() {
+        // 修改功能待实现
+        alert('修改功能待实现');
+    }
+
+    function deletePaper() {
+        // 删除功能待实现
+        alert('删除功能待实现');
+    }
 </script>
 </body>
 </html>
