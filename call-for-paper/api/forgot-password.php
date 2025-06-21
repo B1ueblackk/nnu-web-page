@@ -1,4 +1,15 @@
 <?php
+// 首先检查并加载PHPMailer
+$phpmailerPath = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($phpmailerPath)) {
+    require_once $phpmailerPath;
+}
+
+// 在任何其他代码之前声明use语句
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -13,19 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // 启用错误报告
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-// 检查并加载PHPMailer
-$phpmailerPath = __DIR__ . '/../vendor/autoload.php';
-if (file_exists($phpmailerPath)) {
-    require_once $phpmailerPath;
-
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\SMTP;
-    use PHPMailer\PHPMailer\Exception as PHPMailerException;
-} else {
-    // 如果没有PHPMailer，记录错误但继续执行
-    error_log('PHPMailer not found at: ' . $phpmailerPath);
-}
 
 // 添加日志记录
 function writeLog($message) {
