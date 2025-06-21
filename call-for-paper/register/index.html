@@ -190,24 +190,62 @@
         </div>
         <form class="register-form" id="registerForm">
             <div class="form-group">
-                <label for="name">姓名 *</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
                 <label for="email">邮箱 *</label>
                 <input type="email" id="email" name="email" required>
+                <small style="color: #666; font-size: 12px;">此邮箱为您的登录名</small>
             </div>
             <div class="form-group">
-                <label for="title">称谓 *</label>
-                <select id="title" name="title" required>
-                    <option value="">请选择称谓</option>
+                <label for="title">称谓</label>
+                <select id="title" name="title">
                     <option value="先生">先生</option>
                     <option value="女士">女士</option>
                     <option value="教授">教授</option>
                     <option value="博士">博士</option>
                     <option value="研究员">研究员</option>
                     <option value="工程师">工程师</option>
+                    <option value="学生">学生</option>
+                    <option value="其他">其他</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="surname">姓 *</label>
+                <input type="text" id="surname" name="surname" required>
+            </div>
+            <div class="form-group">
+                <label for="givenName">名 *</label>
+                <input type="text" id="givenName" name="givenName" required>
+            </div>
+            <div class="form-group">
+                <label for="unitName">单位名称 *</label>
+                <input type="text" id="unitName" name="unitName" required>
+            </div>
+            <div class="form-group">
+                <label for="countryRegion">国家/地区</label>
+                <select id="countryRegion" name="countryRegion">
+                    <option value="中国">中国</option>
+                    <option value="美国">美国</option>
+                    <option value="英国">英国</option>
+                    <option value="日本">日本</option>
+                    <option value="韩国">韩国</option>
+                    <option value="德国">德国</option>
+                    <option value="法国">法国</option>
+                    <option value="加拿大">加拿大</option>
+                    <option value="澳大利亚">澳大利亚</option>
+                    <option value="新加坡">新加坡</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="address">通讯地址</label>
+                <textarea id="address" name="address" rows="3" placeholder="请输入详细通讯地址"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="phone">电话 *</label>
+                <input type="text" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="fax">传真</label>
+                <input type="text" id="fax" name="fax">
             </div>
             <div class="form-group">
                 <label for="password">密码 *</label>
@@ -226,6 +264,9 @@
                     <div class="captcha-image-container">
                         <img id="captchaImage" class="captcha-image" src="../api/captcha.php"
                              alt="验证码" onclick="refreshCaptcha()" title="点击刷新验证码">
+                        <a href="javascript:void(0)" class="captcha-refresh" onclick="refreshCaptcha()">
+                            刷新验证码
+                        </a>
                     </div>
                 </div>
             </div>
@@ -278,17 +319,25 @@
 
         // 获取表单数据
         const formData = {
-            name: document.getElementById('name').value.trim(),
             email: document.getElementById('email').value.trim(),
             title: document.getElementById('title').value,
+            surname: document.getElementById('surname').value.trim(),
+            givenName: document.getElementById('givenName').value.trim(),
+            unitName: document.getElementById('unitName').value.trim(),
+            countryRegion: document.getElementById('countryRegion').value,
+            address: document.getElementById('address').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            fax: document.getElementById('fax').value.trim(),
             password: document.getElementById('password').value,
             confirmPassword: document.getElementById('confirmPassword').value,
             captcha: document.getElementById('captcha').value.trim().toUpperCase()
         };
 
         // 前端验证
-        if (!formData.name || !formData.email || !formData.title || !formData.password || !formData.captcha) {
-            showMessage('请填写所有必填字段');
+        if (!formData.email || !formData.surname || !formData.givenName ||
+            !formData.unitName || !formData.phone || !formData.password ||
+            !formData.confirmPassword || !formData.captcha) {
+            showMessage('请填写所有必填字段（标有*的字段）');
             return;
         }
 

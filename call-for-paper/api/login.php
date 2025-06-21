@@ -140,25 +140,43 @@ try {
     $conn->set_charset('utf8mb4');
 
     // 检查表结构，动态适配字段名
-    $columnsResult = $conn->query("SHOW COLUMNS FROM users LIKE 'name'");
-    $hasNameColumn = $columnsResult->num_rows > 0;
-
-    $columnsResult = $conn->query("SHOW COLUMNS FROM users LIKE 'username'");
-    $hasUsernameColumn = $columnsResult->num_rows > 0;
-
-    writeLog('Table structure check - name: ' . ($hasNameColumn ? 'exists' : 'not found') . ', username: ' . ($hasUsernameColumn ? 'exists' : 'not found'));
-
-    // 根据表结构选择合适的字段
-    if ($hasNameColumn) {
-        $nameField = 'name';
-    } elseif ($hasUsernameColumn) {
-        $nameField = 'username';
-    } else {
-        throw new Exception('未找到姓名字段（name 或 username）');
+    $columnsResult = $conn->query("SHOW COLUMNS FROM users");
+    $columns = [];
+    while ($row = $columnsResult->fetch_assoc()) {
+        $columns[] = $row['Field'];
     }
 
-    // 准备SQL语句
-    $sql = "SELECT id, email, password, {$nameField} as user_name FROM users WHERE email = ?";
+    writeLog('Available columns: ' . implode(', ', $columns));
+
+    // 根据表结构选择合适的字段
+    $selectFields = ['id', 'email', 'password', 'title'];
+    $nameField = '';
+
+    if (in_array('surname', $columns) && in_array('given_name', $columns)) {
+        // 新表结构
+        $selectFields[] = 'surname';
+        $selectFields[] = 'given_name';
+        $selectFields[] = 'unit_name';
+        $selectFields[] = 'country_region';
+        $selectFields[] = 'phone';
+        $nameField = 'CONCAT(surname, given_name) as user_name';
+    } elseif (in_array('name', $columns)) {
+        $selectFields[] = 'name as user_name';
+        $nameField = 'name as user_name';
+    } elseif (in_array('username', $columns)) {
+        $selectFields[] = 'username as user_name';
+        $nameField = 'username as user_name';
+    } else {
+        throw new Exception('未找到姓名字段（surname/given_name、name 或 username）');
+    }
+
+    // 构建 SQL 查询
+    $sql = "SELECT " . implode(', ', $selectFields);
+    if ($nameField && !in_array($nameField, $selectFields)) {
+        $sql .= ", " . $nameField;
+    }
+    $sql .= " FROM users WHERE email = ?";
+
     writeLog('SQL query: ' . $sql);
 
     $stmt = $conn->prepare($sql);
@@ -200,19 +218,46 @@ try {
     session_start();
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_email'] = $user['email'];
-    $_SESSION['user_name'] = $user['user_name'];
+
+    // 设置用户名
+    if (isset($user['surname']) && isset($user['given_name'])) {
+        $userName = $user['surname'] . $user['given_name'];
+        $_SESSION['user_name'] = $userName;
+        $_SESSION['user_surname'] = $user['surname'];
+        $_SESSION['user_given_name'] = $user['given_name'];
+    } else {
+        $userName = $user['user_name'];
+        $_SESSION['user_name'] = $userName;
+    }
+
+    $_SESSION['user_title'] = $user['title'];
 
     writeLog('Session created for user: ' . $email);
+
+    // 准备返回的用户信息
+    $userInfo = [
+        'id' => $user['id'],
+        'email' => $user['email'],
+        'name' => $userName,
+        'title' => $user['title']
+    ];
+
+    // 如果有新字段，添加到返回信息中
+    if (isset($user['unit_name'])) {
+        $userInfo['unit_name'] = $user['unit_name'];
+    }
+    if (isset($user['country_region'])) {
+        $userInfo['country_region'] = $user['country_region'];
+    }
+    if (isset($user['phone'])) {
+        $userInfo['phone'] = $user['phone'];
+    }
 
     // 返回成功响应
     echo json_encode([
         'success' => true,
         'message' => '登录成功',
-        'user' => [
-            'id' => $user['id'],
-            'email' => $user['email'],
-            'name' => $user['user_name']
-        ]
+        'user' => $userInfo
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {

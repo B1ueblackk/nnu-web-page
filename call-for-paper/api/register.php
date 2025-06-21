@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// 添加文件日志
+// 添加日志记录
 function writeLog($message) {
     $logFile = __DIR__ . '/register.log';
     $timestamp = date('Y-m-d H:i:s');
@@ -31,12 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
         'success' => false,
-        'message' => '仅支持 POST 请求',
-        'method_received' => $_SERVER['REQUEST_METHOD'],
-        'debug' => [
-            'note' => '这是注册 API，需要通过 POST 方法调用',
-            'example' => 'curl -X POST -H "Content-Type: application/json" -d \'{"name":"test","email":"test@example.com","title":"test","password":"123456"}\' ' . $_SERVER['REQUEST_URI']
-        ]
+        'message' => '仅支持 POST 请求'
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -88,26 +83,18 @@ $db_config = [
     'database' => getenv('DB_NAME')
 ];
 
-writeLog('DB Config - host: ' . $db_config['host'] . ', user: ' . $db_config['username'] . ', db: ' . $db_config['database']);
+writeLog('DB Config loaded');
 
 // 获取POST数据
 $input = file_get_contents('php://input');
 writeLog('Raw input length: ' . strlen($input));
-writeLog('Raw input content: ' . $input);
 
-// 检查输入是否为空
 if (empty($input)) {
     writeLog('Empty input received');
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => '请求体为空，请发送 JSON 数据',
-        'expected_format' => [
-            'name' => 'string',
-            'email' => 'string',
-            'title' => 'string',
-            'password' => 'string'
-        ]
+        'message' => '请求体为空'
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -115,23 +102,29 @@ if (empty($input)) {
 $data = json_decode($input, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     writeLog('JSON error: ' . json_last_error_msg());
-    writeLog('Invalid JSON content: ' . $input);
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => 'JSON 解析错误：' . json_last_error_msg(),
-        'received_content' => $input
+        'message' => 'JSON 解析错误：' . json_last_error_msg()
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$name = $data['name'] ?? '';
+// 获取表单数据
 $email = $data['email'] ?? '';
-$title = $data['title'] ?? '';
 $password = $data['password'] ?? '';
+$confirmPassword = $data['confirmPassword'] ?? '';
+$title = $data['title'] ?? '先生';
+$surname = $data['surname'] ?? '';
+$givenName = $data['givenName'] ?? '';
+$unitName = $data['unitName'] ?? '';
+$countryRegion = $data['countryRegion'] ?? '中国';
+$address = $data['address'] ?? '';
+$phone = $data['phone'] ?? '';
+$fax = $data['fax'] ?? '';
 $captcha = $data['captcha'] ?? '';
 
-writeLog('Received data - name: ' . $name . ', email: ' . $email . ', title: ' . $title);
+writeLog('Received data - email: ' . $email . ', surname: ' . $surname . ', givenName: ' . $givenName);
 
 // 验证验证码
 session_start();
@@ -163,42 +156,63 @@ if (!isset($_SESSION['captcha']) || strtoupper($captcha) !== $_SESSION['captcha'
 unset($_SESSION['captcha']);
 writeLog('Captcha verification passed');
 
-// 验证输入
-if (empty($name) || empty($email) || empty($title) || empty($password)) {
-    writeLog('Validation failed: empty fields');
-    $missing_fields = [];
-    if (empty($name)) $missing_fields[] = 'name';
-    if (empty($email)) $missing_fields[] = 'email';
-    if (empty($title)) $missing_fields[] = 'title';
-    if (empty($password)) $missing_fields[] = 'password';
+// 验证必填字段
+$required_fields = [
+    'email' => $email,
+    'password' => $password,
+    'confirmPassword' => $confirmPassword,
+    'surname' => $surname,
+    'givenName' => $givenName,
+    'unitName' => $unitName,
+    'phone' => $phone
+];
 
+$missing_fields = [];
+foreach ($required_fields as $field => $value) {
+    if (empty($value)) {
+        $missing_fields[] = $field;
+    }
+}
+
+if (!empty($missing_fields)) {
+    writeLog('Validation failed: missing required fields - ' . implode(', ', $missing_fields));
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => '所有字段都必须填写',
+        'message' => '请填写所有必填字段',
         'missing_fields' => $missing_fields
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// 验证密码
+if ($password !== $confirmPassword) {
+    writeLog('Validation failed: password mismatch');
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => '两次输入的密码不一致'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if (strlen($password) < 4) {
+    writeLog('Validation failed: password too short');
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => '密码长度至少4个字符'
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 // 验证邮箱格式
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    writeLog('Validation failed: invalid email');
+    writeLog('Validation failed: invalid email format');
     http_response_code(400);
     echo json_encode([
         'success' => false,
         'message' => '邮箱格式不正确'
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-// 验证密码长度
-if (strlen($password) < 6) {
-    writeLog('Validation failed: password too short');
-    http_response_code(400);
-    echo json_encode([
-        'success' => false,
-        'message' => '密码长度至少6位'
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -240,27 +254,82 @@ try {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     writeLog('Password hashed successfully');
 
-    // 插入新用户
-    $stmt = $conn->prepare('INSERT INTO users (name, email, title, password) VALUES (?, ?, ?, ?)');
-    if (!$stmt) {
-        throw new Exception('准备插入语句失败: ' . $conn->error);
+    // 检查表结构是否包含新字段
+    $columnsResult = $conn->query("SHOW COLUMNS FROM users");
+    $columns = [];
+    while ($row = $columnsResult->fetch_assoc()) {
+        $columns[] = $row['Field'];
     }
 
-    $stmt->bind_param('ssss', $name, $email, $title, $hashedPassword);
+    writeLog('Available columns: ' . implode(', ', $columns));
 
-    if ($stmt->execute()) {
-        writeLog('User created successfully: ' . $email);
+    // 根据表结构动态构建插入语句
+    if (in_array('surname', $columns) && in_array('given_name', $columns)) {
+        // 新表结构 - 插入到新字段
+        $sql = 'INSERT INTO users (email, password, title, surname, given_name, unit_name, country_region, address, phone, fax) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception('准备插入语句失败: ' . $conn->error);
+        }
+        $stmt->bind_param('ssssssssss', $email, $hashedPassword, $title, $surname, $givenName, $unitName, $countryRegion, $address, $phone, $fax);
+        writeLog('Using new table structure with separate surname/given_name fields');
+
+        // 同时更新 name 字段以保持兼容性
+        if (in_array('name', $columns)) {
+            // 先插入基本信息
+            if ($stmt->execute()) {
+                $userId = $conn->insert_id;
+                // 然后更新 name 字段
+                $fullName = $surname . $givenName;
+                $updateStmt = $conn->prepare('UPDATE users SET name = ? WHERE id = ?');
+                $updateStmt->bind_param('si', $fullName, $userId);
+                $updateStmt->execute();
+                $updateStmt->close();
+            }
+        } else {
+            $stmt->execute();
+            $userId = $conn->insert_id;
+        }
+    } else {
+        // 旧表结构 - 合并姓名到现有字段
+        $fullName = $surname . $givenName;
+        if (in_array('name', $columns)) {
+            $nameField = 'name';
+        } elseif (in_array('username', $columns)) {
+            $nameField = 'username';
+        } else {
+            throw new Exception('未找到姓名字段（name 或 username）');
+        }
+
+        $sql = "INSERT INTO users (email, password, title, {$nameField}) VALUES (?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception('准备插入语句失败: ' . $conn->error);
+        }
+        $stmt->bind_param('ssss', $email, $hashedPassword, $title, $fullName);
+        writeLog('Using old table structure with combined name field: ' . $nameField);
+
+        $stmt->execute();
+        $userId = $conn->insert_id;
+    }
+
+    if ($userId > 0) {
+        writeLog('User created successfully: ' . $email . ' (ID: ' . $userId . ')');
+
         echo json_encode([
             'success' => true,
             'message' => '注册成功',
             'user' => [
-                'name' => $name,
+                'id' => $userId,
                 'email' => $email,
-                'title' => $title
+                'name' => $surname . $givenName,
+                'title' => $title,
+                'unit_name' => $unitName,
+                'phone' => $phone
             ]
         ], JSON_UNESCAPED_UNICODE);
     } else {
-        throw new Exception('用户创建失败: ' . $stmt->error);
+        throw new Exception('用户创建失败：获取用户ID失败');
     }
 
 } catch (Exception $e) {
@@ -277,6 +346,6 @@ try {
     if (isset($conn)) {
         $conn->close();
     }
-    writeLog('Script finished');
+    writeLog('Register script finished');
 }
 ?>

@@ -103,23 +103,42 @@ try {
     $conn->set_charset('utf8mb4');
 
     // 检查表结构，动态适配字段名
-    $columnsResult = $conn->query("SHOW COLUMNS FROM users LIKE 'name'");
-    $hasNameColumn = $columnsResult->num_rows > 0;
-
-    $columnsResult = $conn->query("SHOW COLUMNS FROM users LIKE 'username'");
-    $hasUsernameColumn = $columnsResult->num_rows > 0;
-
-    // 根据表结构选择合适的字段
-    if ($hasNameColumn) {
-        $nameField = 'name';
-    } elseif ($hasUsernameColumn) {
-        $nameField = 'username';
-    } else {
-        throw new Exception('未找到姓名字段（name 或 username）');
+    $columnsResult = $conn->query("SHOW COLUMNS FROM users");
+    $columns = [];
+    while ($row = $columnsResult->fetch_assoc()) {
+        $columns[] = $row['Field'];
     }
 
-    // 获取用户信息
-    $sql = "SELECT id, email, {$nameField} as user_name, title, created_at FROM users WHERE id = ?";
+    writeLog('Available columns: ' . implode(', ', $columns));
+
+    // 根据表结构选择合适的字段
+    $selectFields = ['id', 'email', 'title', 'created_at'];
+    $nameField = '';
+
+    if (in_array('surname', $columns) && in_array('given_name', $columns)) {
+        // 新表结构
+        $selectFields = array_merge($selectFields, [
+            'surname', 'given_name', 'unit_name', 'country_region',
+            'address', 'phone', 'fax'
+        ]);
+        $nameField = 'CONCAT(surname, given_name) as user_name';
+    } elseif (in_array('name', $columns)) {
+        $selectFields[] = 'name as user_name';
+        $nameField = 'name as user_name';
+    } elseif (in_array('username', $columns)) {
+        $selectFields[] = 'username as user_name';
+        $nameField = 'username as user_name';
+    } else {
+        throw new Exception('未找到姓名字段（surname/given_name、name 或 username）');
+    }
+
+    // 构建 SQL 查询
+    $sql = "SELECT " . implode(', ', $selectFields);
+    if ($nameField && !in_array($nameField, $selectFields)) {
+        $sql .= ", " . $nameField;
+    }
+    $sql .= " FROM users WHERE id = ?";
+
     writeLog('SQL query: ' . $sql);
 
     $stmt = $conn->prepare($sql);
@@ -149,16 +168,34 @@ try {
     $user = $result->fetch_assoc();
     writeLog('User info retrieved successfully');
 
+    // 准备返回的用户信息
+    $userInfo = [
+        'id' => $user['id'],
+        'email' => $user['email'],
+        'title' => $user['title'],
+        'created_at' => $user['created_at']
+    ];
+
+    // 设置用户名
+    if (isset($user['surname']) && isset($user['given_name'])) {
+        $userInfo['name'] = $user['surname'] . $user['given_name'];
+        $userInfo['surname'] = $user['surname'];
+        $userInfo['given_name'] = $user['given_name'];
+
+        // 添加新字段
+        if (isset($user['unit_name'])) $userInfo['unit_name'] = $user['unit_name'];
+        if (isset($user['country_region'])) $userInfo['country_region'] = $user['country_region'];
+        if (isset($user['address'])) $userInfo['address'] = $user['address'];
+        if (isset($user['phone'])) $userInfo['phone'] = $user['phone'];
+        if (isset($user['fax'])) $userInfo['fax'] = $user['fax'];
+    } else {
+        $userInfo['name'] = $user['user_name'];
+    }
+
     // 返回用户信息
     echo json_encode([
         'success' => true,
-        'user' => [
-            'id' => $user['id'],
-            'name' => $user['user_name'],
-            'email' => $user['email'],
-            'title' => $user['title'],
-            'created_at' => $user['created_at']
-        ]
+        'user' => $userInfo
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
