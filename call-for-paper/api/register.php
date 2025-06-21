@@ -264,73 +264,67 @@ try {
     writeLog('Available columns: ' . implode(', ', $columns));
 
     // 根据表结构动态构建插入语句
-    if (in_array('surname', $columns) && in_array('given_name', $columns)) {
-        // 新表结构 - 插入到新字段
-        $sql = 'INSERT INTO users (email, password, title, surname, given_name, unit_name, country_region, address, phone, fax) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
-            throw new Exception('准备插入语句失败: ' . $conn->error);
-        }
-        $stmt->bind_param('ssssssssss', $email, $hashedPassword, $title, $surname, $givenName, $unitName, $countryRegion, $address, $phone, $fax);
-        writeLog('Using new table structure with separate surname/given_name fields');
+        if (in_array('surname', $columns) && in_array('given_name', $columns)) {
+            // 新表结构 - 有分离的姓名字段
+            $fullName = $surname . $givenName;
 
-        // 同时更新 name 字段以保持兼容性
-        if (in_array('name', $columns)) {
-            // 先插入基本信息
-            if ($stmt->execute()) {
-                $userId = $conn->insert_id;
-                // 然后更新 name 字段
-                $fullName = $surname . $givenName;
-                $updateStmt = $conn->prepare('UPDATE users SET name = ? WHERE id = ?');
-                $updateStmt->bind_param('si', $fullName, $userId);
-                $updateStmt->execute();
-                $updateStmt->close();
+            if (in_array('name', $columns)) {
+                // 同时插入到新字段和name字段
+                $sql = 'INSERT INTO users (email, password, title, name, surname, given_name, unit_name, country_region, address, phone, fax) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    throw new Exception('准备插入语句失败: ' . $conn->error);
+                }
+                $stmt->bind_param('sssssssssss', $email, $hashedPassword, $title, $fullName, $surname, $givenName, $unitName, $countryRegion, $address, $phone, $fax);
+            } else {
+                // 只插入到新字段
+                $sql = 'INSERT INTO users (email, password, title, surname, given_name, unit_name, country_region, address, phone, fax) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    throw new Exception('准备插入语句失败: ' . $conn->error);
+                }
+                $stmt->bind_param('ssssssssss', $email, $hashedPassword, $title, $surname, $givenName, $unitName, $countryRegion, $address, $phone, $fax);
             }
+            writeLog('Using new table structure with separate surname/given_name fields');
         } else {
-            $stmt->execute();
+            // 旧表结构 - 合并姓名到现有字段
+            $fullName = $surname . $givenName;
+            if (in_array('name', $columns)) {
+                $nameField = 'name';
+            } elseif (in_array('username', $columns)) {
+                $nameField = 'username';
+            } else {
+                throw new Exception('未找到姓名字段（name 或 username）');
+            }
+
+            $sql = "INSERT INTO users (email, password, title, {$nameField}) VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                throw new Exception('准备插入语句失败: ' . $conn->error);
+            }
+            $stmt->bind_param('ssss', $email, $hashedPassword, $title, $fullName);
+            writeLog('Using old table structure with combined name field: ' . $nameField);
+        }
+
+        if ($stmt->execute()) {
             $userId = $conn->insert_id;
-        }
-    } else {
-        // 旧表结构 - 合并姓名到现有字段
-        $fullName = $surname . $givenName;
-        if (in_array('name', $columns)) {
-            $nameField = 'name';
-        } elseif (in_array('username', $columns)) {
-            $nameField = 'username';
+            writeLog('User created successfully: ' . $email . ' (ID: ' . $userId . ')');
+
+            echo json_encode([
+                'success' => true,
+                'message' => '注册成功',
+                'user' => [
+                    'id' => $userId,
+                    'email' => $email,
+                    'name' => $surname . $givenName,
+                    'title' => $title,
+                    'unit_name' => $unitName,
+                    'phone' => $phone
+                ]
+            ], JSON_UNESCAPED_UNICODE);
         } else {
-            throw new Exception('未找到姓名字段（name 或 username）');
-        }
-
-        $sql = "INSERT INTO users (email, password, title, {$nameField}) VALUES (?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
-            throw new Exception('准备插入语句失败: ' . $conn->error);
-        }
-        $stmt->bind_param('ssss', $email, $hashedPassword, $title, $fullName);
-        writeLog('Using old table structure with combined name field: ' . $nameField);
-
-        $stmt->execute();
-        $userId = $conn->insert_id;
-    }
-
-    if ($userId > 0) {
-        writeLog('User created successfully: ' . $email . ' (ID: ' . $userId . ')');
-
-        echo json_encode([
-            'success' => true,
-            'message' => '注册成功',
-            'user' => [
-                'id' => $userId,
-                'email' => $email,
-                'name' => $surname . $givenName,
-                'title' => $title,
-                'unit_name' => $unitName,
-                'phone' => $phone
-            ]
-        ], JSON_UNESCAPED_UNICODE);
-    } else {
-        throw new Exception('用户创建失败：获取用户ID失败');
-    }
+            throw new Exception('用户创建失败: ' . $stmt->error);
+      }
 
 } catch (Exception $e) {
     writeLog('Error: ' . $e->getMessage());
