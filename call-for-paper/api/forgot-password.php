@@ -39,17 +39,17 @@ function loadEnv($path) {
     if (!file_exists($path)) {
         throw new Exception('.env file not found at: ' . $path);
     }
-    
+
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
             list($key, $value) = explode('=', $line, 2);
             $key = trim($key);
             $value = trim($value);
-            
+
             // 移除引号
             $value = trim($value, '"\'');
-            
+
             putenv("$key=$value");
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
@@ -156,25 +156,25 @@ try {
     writeLog('Connecting to database...');
     // 连接数据库
     $conn = new mysqli($db_config['host'], $db_config['username'], $db_config['password'], $db_config['database']);
-    
+
     if ($conn->connect_error) {
         throw new Exception('数据库连接失败: ' . $conn->connect_error);
     }
     writeLog('Database connected successfully');
-    
+
     // 设置字符集
     $conn->set_charset('utf8mb4');
-    
+
     // 检查邮箱是否存在
     $stmt = $conn->prepare('SELECT id FROM users WHERE email = ?');
     if (!$stmt) {
         throw new Exception('准备语句失败: ' . $conn->error);
     }
-    
+
     $stmt->bind_param('s', $email);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 0) {
         writeLog('Email not found: ' . $email);
         // 为了安全，不告诉用户邮箱不存在
@@ -184,18 +184,18 @@ try {
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    
+
     writeLog('Email found: ' . $email);
-    
+
     // 生成重置token
     $token = bin2hex(random_bytes(32));
     $expiresAt = date('Y-m-d H:i:s', time() + 1800); // 30分钟后过期
-    
+
     writeLog('Generated reset token: ' . substr($token, 0, 8) . '...');
-    
+
     // 检查是否已存在重置token表
     $tableExists = $conn->query("SHOW TABLES LIKE 'password_reset_tokens'")->num_rows > 0;
-    
+
     if (!$tableExists) {
         // 创建密码重置token表
         $createTableSql = "
@@ -211,13 +211,13 @@ try {
             INDEX idx_expires (expires_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='密码重置token表'
         ";
-        
+
         if (!$conn->query($createTableSql)) {
             throw new Exception('创建密码重置表失败: ' . $conn->error);
         }
         writeLog('Password reset tokens table created');
     }
-    
+
     // 删除该邮箱的旧token
     $deleteStmt = $conn->prepare('DELETE FROM password_reset_tokens WHERE email = ? OR expires_at < NOW()');
     if ($deleteStmt) {
@@ -226,37 +226,73 @@ try {
         $deleteStmt->close();
         writeLog('Old tokens cleaned up');
     }
-    
+
     // 插入新的重置token
     $insertStmt = $conn->prepare('INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)');
     if (!$insertStmt) {
         throw new Exception('准备插入语句失败: ' . $conn->error);
     }
-    
+
     $insertStmt->bind_param('sss', $email, $token, $expiresAt);
-    
-    if ($insertStmt->execute()) {
-        writeLog('Reset token saved to database');
-        
-        // 发送重置邮件
-        $resetUrl = 'https://call-for-paper.jswcs2025.cn/reset-password/index.html?token=' . $token;
-        
-        // 简化版本：记录到日志（实际应该发送邮件）
-        writeLog('Reset URL generated: ' . $resetUrl);
-        
-        // TODO: 这里应该集成邮件发送功能
-        // sendResetEmail($email, $resetUrl);
-        
+
+if ($insertStmt->execute()) {
+    writeLog('Reset token saved to database');
+
+    // 获取用户姓名（可选）
+    $userStmt = $conn->prepare('SELECT name, surname, given_name FROM users WHERE email = ?');
+    $userName = '';
+    if ($userStmt) {
+        $userStmt->bind_param('s', $email);
+        $userStmt->execute();
+        $userResult = $userStmt->get_result();
+        if ($userRow = $userResult->fetch_assoc()) {
+            // 优先使用完整姓名，其次是分开的姓名
+            $userName = $userRow['name'] ?: (($userRow['surname'] ?: '') . ($userRow['given_name'] ?: ''));
+            $userName = trim($userName) ?: $email; // 如果都没有，使用邮箱
+        }
+        $userStmt->close();
+    }
+
+    if (empty($userName)) {
+        $userName = $email; // 最后保底使用邮箱作为称呼
+    }
+
+    // 生成重置URL
+    $resetUrl = 'https://call-for-paper.jswcs2025.cn/reset-password/index.html?token=' . $token;
+    writeLog('Reset URL generated: ' . $resetUrl);
+    writeLog('Sending email to: ' . $email . ' with userName: ' . $userName);
+
+    // 发送重置邮件
+    try {
+        $emailSent = sendResetEmail($email, $resetUrl, $userName);
+
+        if ($emailSent) {
+            writeLog('Reset email sent successfully via 163 to: ' . $email);
+            echo json_encode([
+                'success' => true,
+                'message' => '重置密码链接已通过163邮箱发送到您的邮箱，请在30分钟内点击链接重置密码'
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            writeLog('Failed to send email via 163, but token was saved');
+            // 即使邮件发送失败，也不要告诉用户具体错误，避免泄露信息
+            echo json_encode([
+                'success' => true,
+                'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱。请检查邮箱（包括垃圾邮件文件夹）'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    } catch (Exception $emailError) {
+        writeLog('Email sending exception: ' . $emailError->getMessage());
+        // 同样不泄露错误信息
         echo json_encode([
             'success' => true,
-            'message' => '重置密码链接已发送到您的邮箱，请在30分钟内点击链接重置密码',
-            'debug_url' => $resetUrl // 仅用于调试，生产环境应删除
+            'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱'
         ], JSON_UNESCAPED_UNICODE);
-        
-    } else {
-        throw new Exception('保存重置token失败: ' . $insertStmt->error);
     }
-    
+
+} else {
+    throw new Exception('保存重置token失败: ' . $insertStmt->error);
+}
+
 } catch (Exception $e) {
     writeLog('Error: ' . $e->getMessage());
     http_response_code(500);
