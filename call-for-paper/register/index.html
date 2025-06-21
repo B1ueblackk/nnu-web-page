@@ -363,6 +363,7 @@
 
         try {
             console.log('发送注册请求到:', '../api/register.php');
+            console.log('发送的数据:', formData);
 
             const response = await fetch('../api/register.php', {
                 method: 'POST',
@@ -370,19 +371,22 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    name: formData.name,
                     email: formData.email,
                     title: formData.title,
+                    surname: formData.surname,
+                    givenName: formData.givenName,
+                    unitName: formData.unitName,
+                    countryRegion: formData.countryRegion,
+                    address: formData.address,
+                    phone: formData.phone,
+                    fax: formData.fax,
                     password: formData.password,
+                    confirmPassword: formData.confirmPassword,
                     captcha: formData.captcha
                 })
             });
 
             console.log('响应状态:', response.status);
-            console.log('响应头:');
-            for (let [key, value] of response.headers.entries()) {
-                console.log(`${key}: ${value}`);
-            }
 
             const responseText = await response.text();
             console.log('原始响应:', responseText);
