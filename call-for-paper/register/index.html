@@ -226,7 +226,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             
             // 3秒后跳转到登录页面
             setTimeout(() => {
-                window.location.href = 'login.html';
+                window.location.href = '../login/index.html';
             }, 3000);
         } else {
             errorMessage.textContent = data.message || '注册失败，请稍后重试';
