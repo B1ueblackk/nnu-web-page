@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/email-functions.php';
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -262,54 +263,136 @@ if ($insertStmt->execute()) {
     writeLog('Reset URL generated: ' . $resetUrl);
     writeLog('Sending email to: ' . $email . ' with userName: ' . $userName);
 
-    // 发送重置邮件
+    // 内联邮件发送功能（如果没有引入email-functions.php）
+    $emailSent = false;
     try {
-        $emailSent = sendResetEmail($email, $resetUrl, $userName);
+        // 检查是否有163邮箱配置
+        $email163 = getenv('163_EMAIL');
+        $password163 = getenv('163_EMAIL_PASSWORD');
 
-        if ($emailSent) {
-            writeLog('Reset email sent successfully via 163 to: ' . $email);
-            echo json_encode([
-                'success' => true,
-                'message' => '重置密码链接已通过163邮箱发送到您的邮箱，请在30分钟内点击链接重置密码'
-            ], JSON_UNESCAPED_UNICODE);
+        writeLog('163 Email config check - Email: ' . ($email163 ?: 'not set') . ', Password: ' . ($password163 ? 'set' : 'not set'));
+
+        if ($email163 && $password163) {
+            // 如果没有email-functions.php，这里需要检查PHPMailer
+            if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+                require_once __DIR__ . '/../vendor/autoload.php';
+
+                use PHPMailer\PHPMailer\PHPMailer;
+                use PHPMailer\PHPMailer\SMTP;
+                use PHPMailer\PHPMailer\Exception;
+
+                writeLog('PHPMailer loaded, attempting to send email...');
+
+                $mail = new PHPMailer(true);
+
+                // 163邮箱SMTP配置
+                $mail->isSMTP();
+                $mail->Host = 'smtp.163.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = $email163;
+                $mail->Password = $password163;
+                $mail->SMTPSecure = false; // 尝试不加密
+                $mail->Port = 25;
+                $mail->CharSet = 'UTF-8';
+                $mail->Timeout = 15;
+
+                // 163邮箱特殊设置
+                $mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+
+                // 邮件设置
+                $mail->setFrom($email163, '2025年无线通信与射频感知联合峰会');
+                $mail->addAddress($email, $userName);
+                $mail->addReplyTo($email163, '会议技术支持');
+
+                $mail->isHTML(true);
+                $mail->Subject = '=?UTF-8?B?' . base64_encode('密码重置 - 2025年无线通信与射频感知联合峰会') . '?=';
+
+                // 简化的邮件内容
+                $mail->Body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
+                    <div style='background: #4a90e2; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;'>
+                        <h1>密码重置</h1>
+                        <h2>2025年无线通信与射频感知联合峰会</h2>
+                    </div>
+                    <div style='background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;'>
+                        <p>亲爱的 <strong>{$userName}</strong>，</p>
+                        <p>我们收到了您的密码重置请求。请点击下面的链接重置您的密码：</p>
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <a href='{$resetUrl}' style='background: #4a90e2; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;'>重置密码</a>
+                        </div>
+                        <p>或复制以下链接到浏览器：</p>
+                        <p style='background: #f0f0f0; padding: 10px; border-radius: 4px; word-break: break-all; font-size: 12px;'>{$resetUrl}</p>
+                        <p><strong>注意：</strong></p>
+                        <ul>
+                            <li>此链接30分钟内有效</li>
+                            <li>链接只能使用一次</li>
+                            <li>如非本人操作，请忽略此邮件</li>
+                        </ul>
+                        <p>此致，<br>技术支持团队</p>
+                    </div>
+                </div>";
+
+                $mail->AltBody = "
+密码重置 - 2025年无线通信与射频感知联合峰会
+
+亲爱的 {$userName}，
+
+我们收到了您的密码重置请求。请访问以下链接重置您的密码：
+
+{$resetUrl}
+
+注意：
+- 此链接30分钟内有效
+- 链接只能使用一次
+- 如非本人操作，请忽略此邮件
+
+此致，
+技术支持团队
+";
+
+                writeLog('Attempting to send email via 163...');
+                $emailSent = $mail->send();
+                writeLog('Email send result: ' . ($emailSent ? 'success' : 'failed'));
+
+                if (!$emailSent) {
+                    writeLog('Email send error: ' . $mail->ErrorInfo);
+                }
+
+            } else {
+                writeLog('PHPMailer not found at: ' . __DIR__ . '/../vendor/autoload.php');
+            }
         } else {
-            writeLog('Failed to send email via 163, but token was saved');
-            // 即使邮件发送失败，也不要告诉用户具体错误，避免泄露信息
-            echo json_encode([
-                'success' => true,
-                'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱。请检查邮箱（包括垃圾邮件文件夹）'
-            ], JSON_UNESCAPED_UNICODE);
+            writeLog('163 email credentials not configured');
         }
+
     } catch (Exception $emailError) {
         writeLog('Email sending exception: ' . $emailError->getMessage());
-        // 同样不泄露错误信息
+        $emailSent = false;
+    }
+
+    // 返回响应（不管邮件是否成功发送）
+    if ($emailSent) {
+        writeLog('Reset email sent successfully via 163 to: ' . $email);
         echo json_encode([
             'success' => true,
-            'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱'
+            'message' => '重置密码链接已发送到您的邮箱，请在30分钟内点击链接重置密码'
+        ], JSON_UNESCAPED_UNICODE);
+    } else {
+        writeLog('Failed to send email, but token was saved');
+        // 即使邮件发送失败，也告诉用户成功，避免泄露信息
+        echo json_encode([
+            'success' => true,
+            'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱。请检查邮箱（包括垃圾邮件文件夹）'
         ], JSON_UNESCAPED_UNICODE);
     }
 
 } else {
     throw new Exception('保存重置token失败: ' . $insertStmt->error);
-}
-
-} catch (Exception $e) {
-    writeLog('Error: ' . $e->getMessage());
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => '服务器错误，请稍后重试'
-    ], JSON_UNESCAPED_UNICODE);
-} finally {
-    if (isset($stmt)) {
-        $stmt->close();
-    }
-    if (isset($insertStmt)) {
-        $insertStmt->close();
-    }
-    if (isset($conn)) {
-        $conn->close();
-    }
-    writeLog('Forgot password script finished');
 }
 ?>
