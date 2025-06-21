@@ -99,7 +99,7 @@ function sendResetEmail($email, $resetUrl, $userName = '') {
         $mail->Username = $email163;
         $mail->Password = $password163;
         $mail->SMTPSecure = false; // 不使用加密
-        $mail->Port = 25;
+        $mail->Port = 465;
         $mail->CharSet = 'UTF-8';
         $mail->Timeout = 20;
 

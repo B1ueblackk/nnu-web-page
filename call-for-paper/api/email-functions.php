@@ -341,7 +341,7 @@ function sendWelcomeEmail($email, $userName) {
         $mail->Username = getenv('163_EMAIL') ?: 'your-email@163.com';
         $mail->Password = getenv('163_EMAIL_PASSWORD') ?: 'your-authorization-code';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 25;
+        $mail->Port = 465;
         $mail->CharSet = 'UTF-8';
         $mail->Timeout = 10;
 
