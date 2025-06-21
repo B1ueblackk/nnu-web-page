@@ -9,7 +9,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 // 加载环境变量
 function loadEnv($path) {
     if (!file_exists($path)) {
-        throw new Exception('.env file not found');
+        throw new Exception('.env file not found at: ' . $path);
     }
     
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -31,7 +31,8 @@ function loadEnv($path) {
 
 // 加载环境变量
 try {
-    loadEnv(__DIR__ . '/../.env');
+    $envPath = __DIR__ . '/../.env';
+    loadEnv($envPath);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['message' => '配置错误：' . $e->getMessage()]);
@@ -45,6 +46,9 @@ $db_config = [
     'password' => getenv('DB_PASS'),
     'database' => getenv('DB_NAME')
 ];
+
+// 调试信息
+error_log('DB Config: ' . print_r($db_config, true));
 
 // 获取POST数据
 $data = json_decode(file_get_contents('php://input'), true);
@@ -79,7 +83,7 @@ try {
     $conn = new mysqli($db_config['host'], $db_config['username'], $db_config['password'], $db_config['database']);
     
     if ($conn->connect_error) {
-        throw new Exception('数据库连接失败');
+        throw new Exception('数据库连接失败: ' . $conn->connect_error);
     }
     
     // 检查邮箱是否已存在
