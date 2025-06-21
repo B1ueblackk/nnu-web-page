@@ -129,8 +129,39 @@ $name = $data['name'] ?? '';
 $email = $data['email'] ?? '';
 $title = $data['title'] ?? '';
 $password = $data['password'] ?? '';
+$captcha = $data['captcha'] ?? '';
 
 writeLog('Received data - name: ' . $name . ', email: ' . $email . ', title: ' . $title);
+
+// 验证验证码
+session_start();
+writeLog('Session captcha: ' . ($_SESSION['captcha'] ?? 'not set') . ', User input: ' . $captcha);
+
+if (empty($captcha)) {
+    writeLog('Validation failed: empty captcha');
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => '请输入验证码'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if (!isset($_SESSION['captcha']) || strtoupper($captcha) !== $_SESSION['captcha']) {
+    writeLog('Validation failed: incorrect captcha');
+    // 清除验证码，防止重复使用
+    unset($_SESSION['captcha']);
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => '验证码错误，请重新输入'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// 验证码正确，清除会话中的验证码
+unset($_SESSION['captcha']);
+writeLog('Captcha verification passed');
 
 // 验证输入
 if (empty($name) || empty($email) || empty($title) || empty($password)) {

@@ -56,6 +56,45 @@
             outline: none;
         }
 
+        .captcha-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .captcha-input {
+            flex: 1;
+        }
+
+        .captcha-image-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .captcha-image {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .captcha-image:hover {
+            border-color: #4a90e2;
+        }
+
+        .captcha-refresh {
+            font-size: 12px;
+            color: #4a90e2;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .captcha-refresh:hover {
+            text-decoration: underline;
+        }
+
         .register-button {
             background: linear-gradient(135deg, #4a90e2, #357abd);
             color: white;
@@ -70,6 +109,12 @@
         .register-button:hover {
             background: linear-gradient(135deg, #357abd, #2a5f9e);
             transform: translateY(-1px);
+        }
+
+        .register-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .register-links {
@@ -87,20 +132,29 @@
             text-decoration: underline;
         }
 
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            text-align: center;
+        .message {
+            padding: 10px;
+            border-radius: 4px;
             margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
             display: none;
         }
 
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         .success-message {
-            color: #28a745;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 10px;
-            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -119,8 +173,8 @@
         <a href="https://jswcs2025.cn/registration/index.html">注册登记</a>
         <a href="https://jswcs2025.cn/arrangement/index.html">场地安排</a>
         <a href="https://jswcs2025.cn/schedule/index.html">日程安排</a>
-        <a href="http://call-for-paper.jswcs2025.cn">投稿网址</a>
-        <a href="http://apmtt.org/iwsa2025">IWSA2025</a>
+        <a href="https://call-for-paper.jswcs2025.cn">投稿网址</a>
+        <a href="https://apmtt.org/iwsa2025">IWSA2025</a>
         <a href="https://jswcs2025.cn/dccydljcjsyth/index.html">电磁场与电路集成技术研讨会</a>
         <a href="https://jswcs2025.cn/hmyhm/index.html" target="_blank" rel="noopener noreferrer">全国毫米波、亚毫米波学术会议</a>
         <a href="https://jswcs2025.cn/mnjc/index.html">模拟集成电路研产贯通交流会</a>
@@ -136,32 +190,51 @@
         </div>
         <form class="register-form" id="registerForm">
             <div class="form-group">
-                <label for="name">姓名</label>
+                <label for="name">姓名 *</label>
                 <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="email">邮箱</label>
+                <label for="email">邮箱 *</label>
                 <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="title">称谓</label>
+                <label for="title">称谓 *</label>
                 <select id="title" name="title" required>
-                    <option value="">请选择</option>
+                    <option value="">请选择称谓</option>
                     <option value="先生">先生</option>
                     <option value="女士">女士</option>
+                    <option value="教授">教授</option>
+                    <option value="博士">博士</option>
+                    <option value="研究员">研究员</option>
+                    <option value="工程师">工程师</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="password">密码</label>
-                <input type="password" id="password" name="password" required>
+                <label for="password">密码 *</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <small style="color: #666; font-size: 12px;">密码长度至少6位</small>
             </div>
             <div class="form-group">
-                <label for="confirmPassword">确认密码</label>
+                <label for="confirmPassword">确认密码 *</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" required>
             </div>
-            <button type="submit" class="register-button">注册</button>
-            <div class="error-message" id="errorMessage"></div>
-            <div class="success-message" id="successMessage"></div>
+            <div class="form-group">
+                <label for="captcha">验证码 *</label>
+                <div class="captcha-group">
+                    <input type="text" id="captcha" name="captcha" class="captcha-input"
+                           placeholder="请输入验证码" required maxlength="4">
+                    <div class="captcha-image-container">
+                        <img id="captchaImage" class="captcha-image" src="../api/captcha.php"
+                             alt="验证码" onclick="refreshCaptcha()" title="点击刷新验证码">
+                        <a href="javascript:void(0)" class="captcha-refresh" onclick="refreshCaptcha()">
+                            刷新验证码
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="register-button" id="submitBtn">注册</button>
+            <div class="message error-message" id="errorMessage"></div>
+            <div class="message success-message" id="successMessage"></div>
         </form>
         <div class="register-links">
             <a href="../login/index.html">已有账号？立即登录</a>
@@ -170,75 +243,158 @@
 </div>
 
 <script>
-document.getElementById('registerForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const title = document.getElementById('title').value;
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const errorMessage = document.getElementById('errorMessage');
-    const successMessage = document.getElementById('successMessage');
-    
-    // 隐藏之前的消息
-    errorMessage.style.display = 'none';
-    successMessage.style.display = 'none';
-    
-    // 验证密码
-    if (password !== confirmPassword) {
-        errorMessage.textContent = '两次输入的密码不一致';
-        errorMessage.style.display = 'block';
-        return;
+    // 刷新验证码
+    function refreshCaptcha() {
+        const captchaImage = document.getElementById('captchaImage');
+        captchaImage.src = '../api/captcha.php?' + new Date().getTime();
     }
-    
-    // 验证密码长度
-    if (password.length < 6) {
-        errorMessage.textContent = '密码长度至少6位';
-        errorMessage.style.display = 'block';
-        return;
-    }
-    
-    try {
-        console.log('发送注册请求到:', '../api/register.php');
-        const response = await fetch('../api/register.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                name, 
-                email, 
-                title, 
-                password 
-            })
-        });
-        
-        console.log('响应状态:', response.status);
-        console.log('响应头:', response.headers);
-        
-        const data = await response.json();
-        console.log('响应数据:', data);
-        
-        if (response.ok) {
-            successMessage.textContent = '注册成功！正在跳转到登录页面...';
-            successMessage.style.display = 'block';
-            
-            // 3秒后跳转到登录页面
-            setTimeout(() => {
-                window.location.href = '../login/index.html';
-            }, 3000);
+
+    // 显示消息
+    function showMessage(message, isError = true) {
+        const errorElement = document.getElementById('errorMessage');
+        const successElement = document.getElementById('successMessage');
+
+        if (isError) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            successElement.style.display = 'none';
         } else {
-            errorMessage.textContent = data.message || '注册失败，请稍后重试';
-            errorMessage.style.display = 'block';
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            errorElement.style.display = 'none';
         }
-    } catch (error) {
-        console.error('请求错误:', error);
-        errorMessage.textContent = '注册请求失败，请稍后重试。错误详情：' + error.message;
-        errorMessage.style.display = 'block';
     }
-});
+
+    // 隐藏消息
+    function hideMessages() {
+        document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'none';
+    }
+
+    // 表单提交处理
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        hideMessages();
+
+        const submitBtn = document.getElementById('submitBtn');
+        const form = this;
+
+        // 获取表单数据
+        const formData = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            title: document.getElementById('title').value,
+            password: document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value,
+            captcha: document.getElementById('captcha').value.trim().toUpperCase()
+        };
+
+        // 前端验证
+        if (!formData.name || !formData.email || !formData.title || !formData.password || !formData.captcha) {
+            showMessage('请填写所有必填字段');
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            showMessage('两次输入的密码不一致');
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            showMessage('密码长度至少6位');
+            return;
+        }
+
+        if (formData.captcha.length !== 4) {
+            showMessage('请输入4位验证码');
+            return;
+        }
+
+        // 设置加载状态
+        submitBtn.disabled = true;
+        submitBtn.textContent = '注册中...';
+        form.classList.add('loading');
+
+        try {
+            console.log('发送注册请求到:', '../api/register.php');
+
+            const response = await fetch('../api/register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    title: formData.title,
+                    password: formData.password,
+                    captcha: formData.captcha
+                })
+            });
+
+            console.log('响应状态:', response.status);
+            console.log('响应头:');
+            for (let [key, value] of response.headers.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+
+            const responseText = await response.text();
+            console.log('原始响应:', responseText);
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('JSON 解析错误:', parseError);
+                throw new Error('服务器响应格式错误');
+            }
+
+            if (data.success) {
+                showMessage('注册成功！正在跳转到登录页面...', false);
+                // 清空表单
+                form.reset();
+                refreshCaptcha();
+                // 3秒后跳转到登录页
+                setTimeout(() => {
+                    window.location.href = '../login/index.html';
+                }, 3000);
+            } else {
+                showMessage(data.message || '注册失败，请重试');
+                // 验证码错误时刷新验证码
+                if (data.message && data.message.includes('验证码')) {
+                    refreshCaptcha();
+                    document.getElementById('captcha').value = '';
+                }
+            }
+        } catch (error) {
+            console.error('请求错误:', error);
+            showMessage('网络错误，请检查网络连接后重试');
+            refreshCaptcha();
+        } finally {
+            // 恢复按钮状态
+            submitBtn.disabled = false;
+            submitBtn.textContent = '注册';
+            form.classList.remove('loading');
+        }
+    });
+
+    // 页面加载时刷新验证码
+    document.addEventListener('DOMContentLoaded', function() {
+        refreshCaptcha();
+    });
+
+    // 密码确认实时验证
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+
+        if (confirmPassword && password !== confirmPassword) {
+            this.setCustomValidity('两次输入的密码不一致');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
 </script>
 
 </body>
-</html> 
+</html>
