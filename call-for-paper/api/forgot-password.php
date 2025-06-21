@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/email-functions.php';
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -14,6 +13,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // 启用错误报告
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// 检查并加载PHPMailer
+$phpmailerPath = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($phpmailerPath)) {
+    require_once $phpmailerPath;
+
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\SMTP;
+    use PHPMailer\PHPMailer\Exception as PHPMailerException;
+} else {
+    // 如果没有PHPMailer，记录错误但继续执行
+    error_log('PHPMailer not found at: ' . $phpmailerPath);
+}
 
 // 添加日志记录
 function writeLog($message) {
@@ -55,6 +67,137 @@ function loadEnv($path) {
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
         }
+    }
+}
+
+// 邮件发送函数
+function sendResetEmail($email, $resetUrl, $userName = '') {
+    writeLog('Starting email send process...');
+
+    // 检查是否有PHPMailer类
+    if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        writeLog('PHPMailer class not available');
+        return false;
+    }
+
+    try {
+        // 检查163邮箱配置
+        $email163 = getenv('163_EMAIL');
+        $password163 = getenv('163_EMAIL_PASSWORD');
+
+        writeLog('163 Email config - Email: ' . ($email163 ?: 'not set') . ', Password: ' . ($password163 ? 'set' : 'not set'));
+
+        if (!$email163 || !$password163) {
+            writeLog('163 email credentials not configured');
+            return false;
+        }
+
+        $mail = new PHPMailer(true);
+
+        // 163邮箱SMTP配置
+        $mail->isSMTP();
+        $mail->Host = 'smtp.163.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = $email163;
+        $mail->Password = $password163;
+        $mail->SMTPSecure = false; // 不使用加密
+        $mail->Port = 25;
+        $mail->CharSet = 'UTF-8';
+        $mail->Timeout = 20;
+
+        // 163邮箱特殊设置
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+
+        // 邮件设置
+        $mail->setFrom($email163, '2025年无线通信与射频感知联合峰会');
+        $mail->addAddress($email, $userName);
+        $mail->addReplyTo($email163, '会议技术支持');
+
+        $mail->isHTML(true);
+        $mail->Subject = '=?UTF-8?B?' . base64_encode('密码重置 - 2025年无线通信与射频感知联合峰会') . '?=';
+
+        // 邮件内容
+        $mail->Body = "
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
+            <div style='background: #4a90e2; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;'>
+                <h1>🔐 密码重置</h1>
+                <h2>2025年无线通信与射频感知联合峰会</h2>
+            </div>
+            <div style='background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;'>
+                <p>亲爱的 <strong style='color: #4a90e2;'>{$userName}</strong>，</p>
+                <p>我们收到了您的密码重置请求。请点击下面的按钮重置您的密码：</p>
+                <div style='text-align: center; margin: 30px 0;'>
+                    <a href='{$resetUrl}' style='background: #4a90e2; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;'>🔑 立即重置密码</a>
+                </div>
+                <p>如果按钮无法点击，请复制以下链接到浏览器地址栏：</p>
+                <div style='background: #f0f0f0; padding: 15px; border-radius: 4px; margin: 15px 0; border-left: 4px solid #4a90e2;'>
+                    <code style='word-break: break-all; font-size: 12px; color: #666;'>{$resetUrl}</code>
+                </div>
+                <div style='background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 4px; margin: 20px 0;'>
+                    <p style='margin: 0; color: #856404;'><strong>⚠️ 重要提示：</strong></p>
+                    <ul style='margin: 10px 0 0 0; color: #856404;'>
+                        <li>此链接在 <strong>30分钟</strong> 内有效</li>
+                        <li>链接只能使用 <strong>一次</strong></li>
+                        <li>如非本人操作，请忽略此邮件</li>
+                        <li>请勿将此链接分享给他人</li>
+                    </ul>
+                </div>
+                <p style='margin-top: 30px;'>如有疑问，请联系技术支持。</p>
+                <p>此致敬礼！<br><strong>技术支持团队</strong></p>
+            </div>
+            <div style='text-align: center; padding: 20px; color: #666; font-size: 12px; border-top: 1px solid #ddd;'>
+                <p>此邮件由系统自动发送，请勿直接回复</p>
+                <p>&copy; 2025 无线通信与射频感知联合峰会</p>
+            </div>
+        </div>";
+
+        $mail->AltBody = "
+密码重置 - 2025年无线通信与射频感知联合峰会
+
+亲爱的 {$userName}，
+
+我们收到了您的密码重置请求。请访问以下链接重置您的密码：
+
+{$resetUrl}
+
+重要提示：
+- 此链接在30分钟内有效
+- 链接只能使用一次
+- 如非本人操作，请忽略此邮件
+- 请勿将此链接分享给他人
+
+如有疑问，请联系技术支持。
+
+此致敬礼！
+技术支持团队
+
+---
+此邮件由系统自动发送，请勿直接回复
+© 2025 无线通信与射频感知联合峰会
+";
+
+        writeLog('Attempting to send email via 163...');
+        $result = $mail->send();
+        writeLog('Email send result: ' . ($result ? 'success' : 'failed'));
+
+        if (!$result) {
+            writeLog('Email send error: ' . $mail->ErrorInfo);
+        }
+
+        return $result;
+
+    } catch (PHPMailerException $e) {
+        writeLog('PHPMailer exception: ' . $e->getMessage());
+        return false;
+    } catch (Exception $e) {
+        writeLog('General exception in sendResetEmail: ' . $e->getMessage());
+        return false;
     }
 }
 
@@ -167,7 +310,7 @@ try {
     $conn->set_charset('utf8mb4');
 
     // 检查邮箱是否存在
-    $stmt = $conn->prepare('SELECT id FROM users WHERE email = ?');
+    $stmt = $conn->prepare('SELECT id, name, surname, given_name FROM users WHERE email = ?');
     if (!$stmt) {
         throw new Exception('准备语句失败: ' . $conn->error);
     }
@@ -186,7 +329,12 @@ try {
         exit;
     }
 
+    $user = $result->fetch_assoc();
     writeLog('Email found: ' . $email);
+
+    // 获取用户姓名
+    $userName = $user['name'] ?: (($user['surname'] ?: '') . ($user['given_name'] ?: ''));
+    $userName = trim($userName) ?: $email;
 
     // 生成重置token
     $token = bin2hex(random_bytes(32));
@@ -236,163 +384,54 @@ try {
 
     $insertStmt->bind_param('sss', $email, $token, $expiresAt);
 
-if ($insertStmt->execute()) {
-    writeLog('Reset token saved to database');
+    if ($insertStmt->execute()) {
+        writeLog('Reset token saved to database');
 
-    // 获取用户姓名（可选）
-    $userStmt = $conn->prepare('SELECT name, surname, given_name FROM users WHERE email = ?');
-    $userName = '';
-    if ($userStmt) {
-        $userStmt->bind_param('s', $email);
-        $userStmt->execute();
-        $userResult = $userStmt->get_result();
-        if ($userRow = $userResult->fetch_assoc()) {
-            // 优先使用完整姓名，其次是分开的姓名
-            $userName = $userRow['name'] ?: (($userRow['surname'] ?: '') . ($userRow['given_name'] ?: ''));
-            $userName = trim($userName) ?: $email; // 如果都没有，使用邮箱
-        }
-        $userStmt->close();
-    }
+        // 生成重置URL
+        $resetUrl = 'https://call-for-paper.jswcs2025.cn/reset-password/index.html?token=' . $token;
+        writeLog('Reset URL generated: ' . $resetUrl);
+        writeLog('Sending email to: ' . $email . ' with userName: ' . $userName);
 
-    if (empty($userName)) {
-        $userName = $email; // 最后保底使用邮箱作为称呼
-    }
+        // 发送重置邮件
+        $emailSent = sendResetEmail($email, $resetUrl, $userName);
 
-    // 生成重置URL
-    $resetUrl = 'https://call-for-paper.jswcs2025.cn/reset-password/index.html?token=' . $token;
-    writeLog('Reset URL generated: ' . $resetUrl);
-    writeLog('Sending email to: ' . $email . ' with userName: ' . $userName);
-
-    // 内联邮件发送功能（如果没有引入email-functions.php）
-    $emailSent = false;
-    try {
-        // 检查是否有163邮箱配置
-        $email163 = getenv('163_EMAIL');
-        $password163 = getenv('163_EMAIL_PASSWORD');
-
-        writeLog('163 Email config check - Email: ' . ($email163 ?: 'not set') . ', Password: ' . ($password163 ? 'set' : 'not set'));
-
-        if ($email163 && $password163) {
-            // 如果没有email-functions.php，这里需要检查PHPMailer
-            if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-                require_once __DIR__ . '/../vendor/autoload.php';
-
-                use PHPMailer\PHPMailer\PHPMailer;
-                use PHPMailer\PHPMailer\SMTP;
-                use PHPMailer\PHPMailer\Exception;
-
-                writeLog('PHPMailer loaded, attempting to send email...');
-
-                $mail = new PHPMailer(true);
-
-                // 163邮箱SMTP配置
-                $mail->isSMTP();
-                $mail->Host = 'smtp.163.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = $email163;
-                $mail->Password = $password163;
-                $mail->SMTPSecure = false; // 尝试不加密
-                $mail->Port = 25;
-                $mail->CharSet = 'UTF-8';
-                $mail->Timeout = 15;
-
-                // 163邮箱特殊设置
-                $mail->SMTPOptions = array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                );
-
-                // 邮件设置
-                $mail->setFrom($email163, '2025年无线通信与射频感知联合峰会');
-                $mail->addAddress($email, $userName);
-                $mail->addReplyTo($email163, '会议技术支持');
-
-                $mail->isHTML(true);
-                $mail->Subject = '=?UTF-8?B?' . base64_encode('密码重置 - 2025年无线通信与射频感知联合峰会') . '?=';
-
-                // 简化的邮件内容
-                $mail->Body = "
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
-                    <div style='background: #4a90e2; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;'>
-                        <h1>密码重置</h1>
-                        <h2>2025年无线通信与射频感知联合峰会</h2>
-                    </div>
-                    <div style='background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;'>
-                        <p>亲爱的 <strong>{$userName}</strong>，</p>
-                        <p>我们收到了您的密码重置请求。请点击下面的链接重置您的密码：</p>
-                        <div style='text-align: center; margin: 30px 0;'>
-                            <a href='{$resetUrl}' style='background: #4a90e2; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;'>重置密码</a>
-                        </div>
-                        <p>或复制以下链接到浏览器：</p>
-                        <p style='background: #f0f0f0; padding: 10px; border-radius: 4px; word-break: break-all; font-size: 12px;'>{$resetUrl}</p>
-                        <p><strong>注意：</strong></p>
-                        <ul>
-                            <li>此链接30分钟内有效</li>
-                            <li>链接只能使用一次</li>
-                            <li>如非本人操作，请忽略此邮件</li>
-                        </ul>
-                        <p>此致，<br>技术支持团队</p>
-                    </div>
-                </div>";
-
-                $mail->AltBody = "
-密码重置 - 2025年无线通信与射频感知联合峰会
-
-亲爱的 {$userName}，
-
-我们收到了您的密码重置请求。请访问以下链接重置您的密码：
-
-{$resetUrl}
-
-注意：
-- 此链接30分钟内有效
-- 链接只能使用一次
-- 如非本人操作，请忽略此邮件
-
-此致，
-技术支持团队
-";
-
-                writeLog('Attempting to send email via 163...');
-                $emailSent = $mail->send();
-                writeLog('Email send result: ' . ($emailSent ? 'success' : 'failed'));
-
-                if (!$emailSent) {
-                    writeLog('Email send error: ' . $mail->ErrorInfo);
-                }
-
-            } else {
-                writeLog('PHPMailer not found at: ' . __DIR__ . '/../vendor/autoload.php');
-            }
+        // 返回响应（不管邮件是否成功发送）
+        if ($emailSent) {
+            writeLog('Reset email sent successfully via 163 to: ' . $email);
+            echo json_encode([
+                'success' => true,
+                'message' => '重置密码链接已发送到您的邮箱，请在30分钟内点击链接重置密码'
+            ], JSON_UNESCAPED_UNICODE);
         } else {
-            writeLog('163 email credentials not configured');
+            writeLog('Failed to send email, but token was saved');
+            // 即使邮件发送失败，也告诉用户成功，避免泄露信息
+            echo json_encode([
+                'success' => true,
+                'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱。请检查邮箱（包括垃圾邮件文件夹）'
+            ], JSON_UNESCAPED_UNICODE);
         }
 
-    } catch (Exception $emailError) {
-        writeLog('Email sending exception: ' . $emailError->getMessage());
-        $emailSent = false;
-    }
-
-    // 返回响应（不管邮件是否成功发送）
-    if ($emailSent) {
-        writeLog('Reset email sent successfully via 163 to: ' . $email);
-        echo json_encode([
-            'success' => true,
-            'message' => '重置密码链接已发送到您的邮箱，请在30分钟内点击链接重置密码'
-        ], JSON_UNESCAPED_UNICODE);
     } else {
-        writeLog('Failed to send email, but token was saved');
-        // 即使邮件发送失败，也告诉用户成功，避免泄露信息
-        echo json_encode([
-            'success' => true,
-            'message' => '如果该邮箱已注册，重置链接将发送到您的邮箱。请检查邮箱（包括垃圾邮件文件夹）'
-        ], JSON_UNESCAPED_UNICODE);
+        throw new Exception('保存重置token失败: ' . $insertStmt->error);
     }
 
-} else {
-    throw new Exception('保存重置token失败: ' . $insertStmt->error);
+} catch (Exception $e) {
+    writeLog('Error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => '服务器错误，请稍后重试'
+    ], JSON_UNESCAPED_UNICODE);
+} finally {
+    if (isset($stmt)) {
+        $stmt->close();
+    }
+    if (isset($insertStmt)) {
+        $insertStmt->close();
+    }
+    if (isset($conn)) {
+        $conn->close();
+    }
+    writeLog('Forgot password script finished');
 }
 ?>
