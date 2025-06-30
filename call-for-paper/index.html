@@ -121,31 +121,93 @@
         <!-- 主内容区 -->
         <main class="main">
             <!-- 个人中心 -->
-            <section class="section profile-section">
-                <div class="profile-header">
-                    <div class="profile-info">
-                        <div class="profile-name">尊敬的先生/女士</div>
-                        <div class="profile-actions">
-                            <button class="btn btn-login" onclick="login()">
-                                <i class="fas fa-sign-in-alt"></i> 登录
-                            </button>
+<!--            <section class="section profile-section">-->
+<!--                <div class="profile-header">-->
+<!--                    <div class="profile-info">-->
+<!--                        <div class="profile-name">尊敬的先生/女士</div>-->
+<!--                        <div class="profile-actions">-->
+<!--                            <button class="btn btn-login" onclick="login()">-->
+<!--                                <i class="fas fa-sign-in-alt"></i> 登录-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="profile-message">-->
+<!--                    <p>请先登录以访问投稿系统</p>-->
+<!--                </div>-->
+<!--            </section>-->
+
+            <!-- 投稿要求 -->
+            <section class="section intro">
+                <h2>征文要求</h2>
+
+                <p class="highlight">论文应有所创新，重点突出，论述严谨，文字流畅，采用国际标准计量单位。</p>
+
+                <p>总体要求：论文必须是未在其它专业会议和刊物上发表过，论文篇幅包含英文题名和摘要，采用A4格式，全文包括图表、参考文献在内限3页篇幅，论文语言以中文为主，港、澳、台地区的作者可投稿英文论文。</p>
+
+                <h2>模板下载与投稿方式</h2>
+
+                    <p>
+                        <strong>论文模板下载：</strong>会议只接受Word（文件名后缀为.doc）格式的投稿文件，投稿时请注明联系号。
+                    </p>
+
+                    <div class="submission-method">
+                        <h4><i class="fas fa-envelope"></i> 投稿方式</h4>
+                        <div class="email-submission">
+                            <p>请将完成的论文发送至会议投稿邮箱：njust_smby@126.com</p>
+                            <h5>邮件投稿须知：</h5>
+                            <ul>
+                                <li><strong>邮件主题格式：</strong>【JSWCS2025投稿】论文标题_第一作者姓名</li>
+                                <li><strong>邮件正文请包含：</strong>
+                                    <ul>
+                                        <li>第一作者姓名、单位、联系电话</li>
+                                        <li>论文简要说明（100字以内）</li>
+                                        <li>是否需要安排口头报告</li>
+                                    </ul>
+                                </li>
+                                <li><strong>附件要求：</strong>论文文件命名格式为"论文标题_第一作者.doc"</li>
+                                <li><strong>投稿确认：</strong>投稿后3个工作日内将收到确认回复</li>
+                            </ul>
                         </div>
                     </div>
+
+                    <div class="download-section">
+                        <div class="download-item">
+                            <i class="download-icon">📄</i>
+                            <div class="download-info">
+                                <h4>中文论文模板</h4>
+                                <p>适用于中文投稿的标准格式模板</p>
+                                <a href="#" class="download-link" onclick="downloadTemplate('chinese')">
+                                    <i class="fas fa-download"></i> 下载模板 (.doc)
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="download-item">
+                            <i class="download-icon">📄</i>
+                            <div class="download-info">
+                                <h4>英文论文模板</h4>
+                                <p>适用于英文投稿的标准格式模板</p>
+                                <a href="#" class="download-link" onclick="downloadTemplate('english')">
+                                    <i class="fas fa-download"></i> 下载模板 (.doc)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="submission-notice">
+                    <h3>重要提醒</h3>
+                    <ul>
+                        <li>投稿截止日期：2025年8月31日</li>
+                        <li>投稿邮箱：njust_smby@126.com</li>
+                        <li>文件格式：仅接受 .doc 格式（Word文档）</li>
+                        <li>页数限制：全文包括图表、参考文献在内限3页</li>
+                        <li>投稿时请务必注明联系号码</li>
+                        <li>论文必须为原创，未在其他会议或期刊发表</li>
+                    </ul>
                 </div>
-                <div class="profile-message">
-                    <p>请先登录以访问投稿系统</p>
-                </div>
-            </section>
-
-            <!-- 会议简介 -->
-            <section class="section intro">
-                <h2>投稿网址</h2>
-
-                <p class="subtitle">敬请期待</p>
-                <p>相关内容正在制作中</p>
 
             </section>
-
 
             <section class="section schools-section">
                 <h2>合作院校与组织</h2>
@@ -178,5 +240,389 @@
 </div>
 
 <script src="./assets/main.js"></script>
+<script>
+    // 模板下载功能
+    function downloadTemplate(type) {
+        if (type === 'chinese') {
+            // 这里您需要将实际的中文模板文件放在服务器上
+            const link = document.createElement('a');
+            link.href = './assets/templates/微波学报论文模板.doc';
+            link.download = '中文论文模板.doc';
+            link.click();
+
+            alert('中文论文模板下载开始！\n\n下载说明：\n1. 请将模板文件保存到您的电脑\n2. 使用Microsoft Word打开模板\n3. 按照模板格式撰写论文\n4. 完成后保存为.doc格式投稿至：njust_smby@126.com');
+        } else if (type === 'english') {
+            // // 这里您需要将实际的英文模板文件放在服务器上
+            // const link = document.createElement('a');
+            // link.href = './assets/templates/english_template.doc';
+            // link.download = 'English_Paper_Template.doc';
+            // link.click();
+
+            // alert('英文论文模板下载开始！\n\n下载说明：\n1. Please save the template file to your computer\n2. Open the template with Microsoft Word\n3. Write your paper following the template format\n4. Save as .doc format and submit to: njust_smby@126.com');
+            alert('英文模板制作中！')
+        }
+    }
+
+    // 复制邮箱地址功能
+    function copyEmail() {
+        const email = 'njust_smby@126.com';
+
+        // 使用现代浏览器的 Clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(email).then(() => {
+                showCopySuccess();
+            }).catch(() => {
+                fallbackCopyTextToClipboard(email);
+            });
+        } else {
+            // 降级处理
+            fallbackCopyTextToClipboard(email);
+        }
+    }
+
+    // 降级复制方案
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            document.execCommand('copy');
+            showCopySuccess();
+        } catch (err) {
+            alert('复制失败，请手动复制邮箱地址：' + text);
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+    // 显示复制成功提示
+    function showCopySuccess() {
+        const button = document.querySelector('.copy-email');
+        const originalHTML = button.innerHTML;
+
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.style.background = '#28a745';
+
+        // 显示提示消息
+        const tooltip = document.createElement('div');
+        tooltip.className = 'copy-tooltip';
+        tooltip.textContent = '邮箱地址已复制！';
+        button.appendChild(tooltip);
+
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            if (tooltip.parentNode) {
+                tooltip.parentNode.removeChild(tooltip);
+            }
+        }, 2000);
+    }
+</script>
+
+<style>
+    /* 投稿要求专用样式 */
+    .submission-requirements {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        border-left: 4px solid var(--accent);
+    }
+
+    /* 投稿方式样式 */
+    .submission-method {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        border: 2px solid #e9ecef;
+    }
+
+    .submission-method h4 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .email-submission {
+        margin-top: 1rem;
+    }
+
+    .email-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .email-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .email-info i {
+        color: #fff;
+        font-size: 1.5rem;
+    }
+
+    .email-address {
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        letter-spacing: 1px;
+    }
+
+    .copy-email {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: #fff;
+        padding: 0.5rem 0.8rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        font-size: 1.1rem;
+    }
+
+    .copy-email:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .copy-tooltip {
+        position: absolute;
+        top: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 1000;
+    }
+
+    .copy-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #28a745;
+    }
+
+    .email-guidelines {
+        background: #f8f9fa;
+        padding: 1.2rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        border-left: 4px solid var(--primary);
+    }
+
+    .email-guidelines h5 {
+        color: var(--primary);
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+    }
+
+    .email-guidelines ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .email-guidelines > ul > li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.2rem;
+        position: relative;
+    }
+
+    .email-guidelines > ul > li:before {
+        content: "📧";
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .email-guidelines ul ul {
+        margin-top: 0.5rem;
+        margin-left: 1rem;
+    }
+
+    .email-guidelines ul ul li {
+        margin-bottom: 0.4rem;
+        padding-left: 1rem;
+        position: relative;
+    }
+
+    .email-guidelines ul ul li:before {
+        content: "•";
+        color: var(--accent);
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+
+    .download-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .download-item {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .download-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .download-icon {
+        font-size: 2.5rem;
+        color: var(--accent);
+    }
+
+    .download-info h4 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .download-info p {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .download-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), #1a365d);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .download-link:hover {
+        background: linear-gradient(135deg, #1a365d, var(--primary));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .submission-notice {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .submission-notice h3 {
+        color: #856404;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .submission-notice ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .submission-notice li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.8rem;
+        color: #856404;
+        font-weight: 500;
+    }
+
+    .submission-notice li:before {
+        content: "⚠️";
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .download-section {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .download-item {
+            padding: 1rem;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .download-icon {
+            font-size: 2rem;
+        }
+
+        .submission-requirements {
+            padding: 1rem;
+        }
+
+        .submission-notice {
+            padding: 1rem;
+        }
+
+        .submission-method {
+            padding: 1rem;
+        }
+
+        .email-box {
+            padding: 1rem;
+        }
+
+        .email-info {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .email-address {
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+
+        .email-guidelines {
+            padding: 1rem;
+        }
+    }
+</style>
 </body>
 </html>
