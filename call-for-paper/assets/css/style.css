@@ -779,3 +779,54 @@ img {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
+
+/* 征文范围两列有序列表 */
+.scope-list {
+    column-count: 2;
+    column-gap: 2.5em;
+    padding-left: 2em;
+    margin: 1.2em 0;
+    font-size: 1.08em;
+}
+.scope-list li {
+    break-inside: avoid;
+    margin-bottom: 0.7em;
+    line-height: 1.7;
+}
+@media (max-width: 700px) {
+    .scope-list {
+        column-count: 1;
+        padding-left: 1.2em;
+    }
+}
+
+/* 会议注册费表格样式（无色极简） */
+.fee-table {
+    width: 100%;
+    max-width: 400px;
+    margin: 1.2em auto;
+    border-collapse: collapse;
+    font-size: 1.08em;
+    background: none;
+    box-shadow: none;
+}
+.fee-table th, .fee-table td {
+    border: 1px solid #bbb;
+    padding: 0.7em 1.2em;
+    text-align: center;
+    background: none;
+    color: #222;
+    font-weight: 400;
+}
+.fee-table th {
+    font-weight: 600;
+}
+.fee-table tr:nth-child(even) td {
+    background: none;
+}
+@media (max-width: 600px) {
+    .fee-table, .fee-table th, .fee-table td {
+        font-size: 0.98em;
+        padding: 0.5em 0.5em;
+    }
+}
