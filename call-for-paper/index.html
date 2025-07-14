@@ -76,6 +76,9 @@
                         <h3>主办单位</h3>
                         <div class="logo-grid organizers">
                             <div class="logo-item">
+                                <img src="./assets/img/right_logo/主办单位/2中国电子学会.jpg" alt="中国电子学会">
+                            </div>
+                            <div class="logo-item">
                                 <img src="./assets/img/left_logo/1.%20IEEE%20Macau%20APMTT%20Joint%20Chapter.png" alt="IEEE Macau AP/MTT Joint Chapter">
                             </div>
                             <div class="logo-item">
@@ -97,9 +100,6 @@
                     <div class="org-section">
                         <h3>协办单位</h3>
                         <div class="logo-grid co-organizers">
-                            <div class="logo-item">
-                                <img src="./assets/img/right_logo/主办单位/2中国电子学会.jpg" alt="中国电子学会">
-                            </div>
                             <div class="logo-item">
                                 <img src="./assets/img/right_logo/主办单位/3中国电子科技集团公司第十四研究所.jpg" alt="中国电子科技集团公司第十四研究所">
                             </div>
@@ -139,11 +139,11 @@
 
             <!-- 投稿要求 -->
             <section class="section intro">
-                <h2>征文要求</h2>
+                <h2>全国毫米波、亚毫米波学术会议征文要求</h2>
 
                 <p class="highlight">论文应有所创新，重点突出，论述严谨，文字流畅，采用国际标准计量单位。</p>
 
-                <p>总体要求：论文必须是未在其它专业会议和刊物上发表过，全文包括中英文摘要、图表、参考文献在内限4页篇幅，论文语音以中文为主，来稿请严格按照《微波学报》论文模板排版。</p>
+                <p>总体要求：论文必须是未在其它专业会议和刊物上发表过，全文包括中英文摘要、图表、参考文献在内限4页篇幅，论文语言以中文为主，来稿请严格按照《微波学报》论文模板排版。</p>
 
                 <h2>模板下载与投稿方式</h2>
 
@@ -154,7 +154,7 @@
                     <div class="submission-method">
                         <h4><i class="fas fa-envelope"></i> 投稿方式</h4>
                         <div class="email-submission">
-                            <p>请将完成的论文发送至会议投稿邮箱：njust_smby@126.com</p>
+                            <p>请将完成的论文、投稿信息表格以及不涉密证明照片发送至会议投稿邮箱：njust_smby@126.com</p>
 <!--                            <h5>邮件投稿须知：</h5>-->
                             <ul>
                                 <li><strong>邮件主题格式：</strong>专题号_论文标题_第一作者</li>
@@ -181,10 +181,10 @@
                         <div class="download-item">
                             <i class="download-icon">📄</i>
                             <div class="download-info">
-                                <h4>中文论文模板</h4>
+                                <h4>投稿信息模板</h4>
                                 <p>适用于中文投稿的标准格式模板</p>
                                 <a href="#" class="download-link" onclick="downloadTemplate('chinese')">
-                                    <i class="fas fa-download"></i> 下载模板 (.doc)
+                                    <i class="fas fa-download"></i> 下载模板 (.xlsx)
                                 </a>
                             </div>
                         </div>
@@ -207,7 +207,7 @@
                         <li>投稿截止日期：2025年8月31日</li>
                         <li>投稿邮箱：njust_smby@126.com</li>
                         <li>文件格式：仅接受 .doc 格式（Word文档）</li>
-                        <li>页数限制：全文包括图表、参考文献在内限3页</li>
+                        <li>页数限制：全文包括图表、参考文献在内限4页</li>
                         <li>投稿时请务必注明联系号码</li>
                         <li>论文必须为原创，未在其他会议或期刊发表</li>
                     </ul>
@@ -290,8 +290,8 @@
         if (type === 'chinese') {
             // 这里您需要将实际的中文模板文件放在服务器上
             const link = document.createElement('a');
-            link.href = './assets/templates/微波学报论文模板.doc';
-            link.download = '中文论文模板.doc';
+            link.href = './assets/templates/投稿信息模板-20250708.xlsx';
+            link.download = '投稿信息模板.xlsx';
             link.click();
 
             // alert('中文论文模板下载开始！\n\n下载说明：\n1. 请将模板文件保存到您的电脑\n2. 使用Microsoft Word打开模板\n3. 按照模板格式撰写论文\n4. 完成后保存为.doc格式投稿至：njust_smby@126.com');
