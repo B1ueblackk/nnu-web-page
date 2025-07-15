@@ -175,27 +175,13 @@
                                 <li><strong>请将完成的论文、投稿信息表格以及不涉密证明发送至会议投稿邮箱：njust_smby@126.com</strong></li>
                             </ul>
                         </div>
-                    </div>
-
-                    <div class="download-section">
                         <div class="download-item">
                             <i class="download-icon">📄</i>
                             <div class="download-info">
                                 <h4>投稿信息模板</h4>
                                 <p>适用于中文投稿的标准格式模板</p>
                                 <a href="#" class="download-link" onclick="downloadTemplate('chinese')">
-                                    <i class="fas fa-download"></i> 下载模板 (.xlsx)
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="download-item">
-                            <i class="download-icon">📄</i>
-                            <div class="download-info">
-                                <h4>不涉密证明模板</h4>
-                                <p>不涉密证明的标准格式模板</p>
-                                <a href="#" class="download-link" onclick="downloadTemplate('secret')">
-                                    <i class="fas fa-download"></i> 下载模板 (.doc)
+                                    <i class="fas fa-download"></i> 下载模板 (.zip)
                                 </a>
                             </div>
                         </div>
@@ -287,24 +273,11 @@
 <script>
     // 模板下载功能
     function downloadTemplate(type) {
-        if (type === 'chinese') {
-            // 这里您需要将实际的中文模板文件放在服务器上
-            const link = document.createElement('a');
-            link.href = './assets/templates/投稿信息模板-20250708.xlsx';
-            link.download = '投稿信息模板.xlsx';
-            link.click();
-
-            // alert('中文论文模板下载开始！\n\n下载说明：\n1. 请将模板文件保存到您的电脑\n2. 使用Microsoft Word打开模板\n3. 按照模板格式撰写论文\n4. 完成后保存为.doc格式投稿至：njust_smby@126.com');
-        } else if (type === 'secret') {
-            // 这里您需要将实际的英文模板文件放在服务器上
-            const link = document.createElement('a');
-            link.href = './assets/templates/论文不涉密证明及著作权转让协议.doc';
-            link.download = '论文不涉密证明及著作权转让协议.doc';
-            link.click();
-
-            // alert('论文不涉密证明模板下载开始！\n\n下载说明：\n1. Please save the template file to your computer\n2. Open the template with Microsoft Word\n3. Write your paper following the template format\n4. Save as .doc format and submit to: njust_smby@126.com');
-            // alert('英文模板制作中！')
-        }
+        // 这里您需要将实际的中文模板文件放在服务器上
+        const link = document.createElement('a');
+        link.href = './assets/templates/templates.zip';
+        link.download = 'templates.zip';
+        link.click();
     }
 
     // 复制邮箱地址功能
