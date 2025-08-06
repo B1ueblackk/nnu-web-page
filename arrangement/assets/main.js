@@ -101,26 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// 倒计时功能
-function updateCountdown() {
-    const targetDate = new Date('2025-09-10T00:00:00');
-    const now = new Date();
-    const diff = targetDate - now;
-
-    if (diff <= 0) {
-        document.getElementById('time-left').textContent = '会议已开始';
-        return;
-    }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    document.getElementById('time-left').textContent = 
-        `${days} 天 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
 // 滚动
 window.addEventListener('DOMContentLoaded', () => {
     const ul = document.querySelector('.credits ul');
