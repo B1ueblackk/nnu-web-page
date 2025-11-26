@@ -1,5 +1,5 @@
 // === 倒计时 ===
-const target = new Date('2025-10-09T00:00:00');
+const target = new Date('2025-12-05T00:00:00');
 function updateClock () {
     const timerEl = document.getElementById('time-left');
     if (!timerEl) return;  // 倒计时元素不存在时直接返回
