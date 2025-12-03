@@ -125,6 +125,18 @@
                 <h2>日程安排</h2>
                 <p class="subtitle">会议日期</p>
                 <p><strong>2025 年 12 月 5 日至 7 日</strong></p>
+
+                <div class="download-section" style="margin-top: 2rem;">
+                    <div class="download-item">
+                        <i class="download-icon">📄</i>
+                        <div class="download-info">
+                            <h4>大会日程</h4>
+                            <a href="./assets/Program-20251203-sv-2.pdf" class="download-link" download>
+                                <span>下载日程 (PDF)</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </section>
 
 
@@ -159,5 +171,84 @@
 </div>
 
 <script src="assets/main.js"></script>
+
+<style>
+    .download-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .download-item {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .download-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .download-icon {
+        font-size: 2.5rem;
+        color: var(--accent);
+    }
+
+    .download-info h4 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .download-info p {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .download-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), #1a365d);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .download-link:hover {
+        background: linear-gradient(135deg, #1a365d, var(--primary));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 768px) {
+        .download-section {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .download-item {
+            padding: 1rem;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .download-icon {
+            font-size: 2rem;
+        }
+    }
+</style>
 </body>
 </html>
